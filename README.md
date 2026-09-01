@@ -1,6 +1,7 @@
 # Portfólio — Christian Saturnino
 
 Site pessoal bilíngue (PT/EN). Astro, sem framework de UI, conteúdo tipado em `src/data`.
+https://portfolio-lovat-nine-27.vercel.app/
 
 ## Rodar
 
