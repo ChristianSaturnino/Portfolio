@@ -1,0 +1,426 @@
+---
+import { site, type Lang } from "../data/site";
+import { useTranslations } from "../i18n/ui";
+import { chatScript } from "../data/chat";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// tagline: last word gets the accent
+const words = site.tagline[lang].split(" ");
+const lead = words.slice(0, -1).join(" ");
+const last = words.at(-1);
+
+const turns = chatScript[lang];
+const chatDataJson = JSON.stringify(turns).replace(/</g, "\\u003c");
+---
+
+<section class="hero" id="about">
+  <div class="container hero-grid">
+    <div class="hero-main">
+      <p class="eyebrow reveal">{site.role[lang].toLowerCase()} · {site.location[lang].toLowerCase()}</p>
+
+      <h1 class="reveal" data-delay="1">
+        {lead} <span class="accent">{last}<span class="caret" aria-hidden="true"></span></span>
+      </h1>
+
+      <p class="prose lede reveal" data-delay="2">{site.intro[lang]}</p>
+
+      <div class="actions reveal" data-delay="3">
+        <a class="btn btn-primary" href={`mailto:${site.email}`}>{t("contact.email")}</a>
+        <a class="btn" href={site.cv[lang]} target="_blank" rel="noopener">{t("hero.resume")} (PDF)</a>
+        <a class="btn btn-ghost" href={site.socials.github} target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-ghost" href={site.socials.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+
+    <aside class="hero-aside reveal" data-delay="2">
+      <figure class="portrait">
+        <div class="portrait-img">
+          <img
+            src="/img/christian.webp"
+            width="400"
+            height="400"
+            alt={site.fullName}
+            fetchpriority="high"
+          />
+        </div>
+        <figcaption class="mono">{site.name}</figcaption>
+      </figure>
+
+      <div class="chat" aria-hidden="true">
+        <div class="chat-head">
+          <span class="lhs"><span class="dot"></span>chat</span>
+          <span>auto</span>
+        </div>
+        <div class="chat-log" data-chat-log>
+          <div class="msg user"><p class="bubble">{turns[0].q}</p></div>
+          <div class="msg bot"><span class="who">christian</span><p class="bubble">{turns[0].a}</p></div>
+        </div>
+      </div>
+      <script type="application/json" is:inline set:html={chatDataJson} id="chat-data"></script>
+    </aside>
+  </div>
+</section>
+
+<script>
+  const dataEl = document.getElementById("chat-data");
+  const log = document.querySelector<HTMLElement>("[data-chat-log]");
+
+  if (dataEl && log) {
+    type Turn = { q: string; a: string };
+    let turns: Turn[] = [];
+    try {
+      turns = JSON.parse(dataEl.textContent || "[]");
+    } catch {
+      turns = [];
+    }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    const addMsg = (kind: "user" | "bot") => {
+      const row = document.createElement("div");
+      row.className = "msg " + kind;
+      if (kind === "bot") {
+        const who = document.createElement("span");
+        who.className = "who";
+        who.textContent = "christian";
+        row.appendChild(who);
+      }
+      const bubble = document.createElement("p");
+      bubble.className = "bubble";
+      row.appendChild(bubble);
+      log.appendChild(row);
+      return bubble;
+    };
+
+    const typeInto = async (bubble: HTMLElement, text: string) => {
+      bubble.classList.add("typing");
+      for (let i = 1; i <= text.length; i++) {
+        bubble.textContent = text.slice(0, i);
+        await wait(20 + Math.random() * 26);
+      }
+      bubble.classList.remove("typing");
+    };
+
+    const think = async (bubble: HTMLElement) => {
+      bubble.classList.add("dots");
+      bubble.innerHTML = "<span></span><span></span><span></span>";
+      await wait(700 + Math.random() * 500);
+      bubble.classList.remove("dots");
+      bubble.textContent = "";
+    };
+
+    const runTurn = async (turn: Turn) => {
+      log.replaceChildren();
+      const q = addMsg("user");
+      await wait(280);
+      await typeInto(q, turn.q);
+      await wait(340);
+      const a = addMsg("bot");
+      await think(a);
+      await typeInto(a, turn.a);
+      await wait(2800);
+    };
+
+    if (reduce || !turns.length) {
+      const t0 = turns[0] ?? { q: "quem é você?", a: "Christian, engenheiro de software." };
+      log.replaceChildren();
+      addMsg("user").textContent = t0.q;
+      addMsg("bot").textContent = t0.a;
+    } else {
+      (async () => {
+        let i = 0;
+        while (true) {
+          if (document.hidden) {
+            await wait(1000);
+            continue;
+          }
+          await runTurn(turns[i]);
+          i = (i + 1) % turns.length;
+        }
+      })();
+    }
+  }
+</script>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 9vh, 5rem) clamp(3rem, 8vh, 5rem);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.95fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  h1 {
+    font-size: clamp(2.3rem, 6vw, 3.9rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    margin: 0.9rem 0 1.4rem;
+  }
+  h1 .accent {
+    color: var(--accent);
+  }
+  .caret {
+    display: inline-block;
+    width: 0.14em;
+    height: 0.72em;
+    margin-left: 0.12em;
+    vertical-align: baseline;
+    background: var(--accent);
+    animation: blink 1.05s step-end infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .lede {
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 2.25rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    height: 2.6rem;
+    padding-inline: 1.1rem;
+    border-radius: 7px;
+    border: 1px solid var(--border-strong);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: border-color 0.18s var(--ease), background 0.18s var(--ease), color 0.18s var(--ease),
+      transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--text-mute);
+  }
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 6px 20px -6px var(--accent-glow), 0 0 0 3px var(--accent-glow);
+    border-color: var(--accent);
+  }
+  .btn-ghost {
+    border-color: var(--border);
+    color: var(--text-dim);
+  }
+
+  /* aside: portrait + chat demo */
+  .hero-aside {
+    display: grid;
+    gap: 1rem;
+    padding-top: 0.4rem;
+  }
+
+  .portrait {
+    margin: 0;
+  }
+  .portrait-img {
+    position: relative;
+    width: clamp(9rem, 22vw, 12.5rem);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    padding: 4px;
+    background: linear-gradient(150deg, var(--accent-dim), transparent 55%);
+  }
+  .portrait-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+  }
+  .portrait-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 999px;
+  }
+  .portrait figcaption {
+    margin-top: 0.7rem;
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+  }
+  .portrait figcaption::before {
+    content: "> ";
+    color: var(--accent-dim);
+  }
+
+  @media (max-width: 860px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-aside {
+      grid-auto-flow: row;
+    }
+    .portrait {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .portrait figcaption {
+      margin-top: 0;
+    }
+  }
+</style>
+
+{/* chat rules are global: messages are built at runtime with createElement,
+    so Astro's scoped-style attribute never lands on them */}
+<style is:global>
+  .chat {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow: hidden;
+  }
+  .chat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-mute);
+  }
+  .chat-head .lhs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .chat-head .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .chat-log {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    height: 9rem;
+    padding: 0.8rem;
+    overflow: hidden;
+  }
+  .chat-log .msg {
+    display: flex;
+    flex-direction: column;
+    animation: chat-msg-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes chat-msg-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+  .chat-log .msg.user {
+    align-items: flex-end;
+  }
+  .chat-log .msg.user .bubble {
+    max-width: 85%;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 9px 9px 3px 9px;
+    background: var(--bg-elev-2);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+  .chat-log .msg.bot .who {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-dim);
+    margin-bottom: 0.3rem;
+  }
+  .chat-log .msg.bot .who::before {
+    content: "> ";
+  }
+  .chat-log .msg.bot .bubble {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .chat-log .bubble.typing::after {
+    content: "";
+    display: inline-block;
+    width: 0.5ch;
+    height: 1em;
+    margin-left: 1px;
+    vertical-align: -0.15em;
+    background: var(--accent);
+    animation: chat-blink 1.05s step-end infinite;
+  }
+  @keyframes chat-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .chat-log .bubble.dots {
+    display: inline-flex;
+    gap: 3px;
+    padding: 0.35rem 0;
+  }
+  .chat-log .bubble.dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-mute);
+    animation: chat-dots 1.2s ease-in-out infinite;
+  }
+  .chat-log .bubble.dots span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .chat-log .bubble.dots span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes chat-dots {
+    0%,
+    60%,
+    100% {
+      opacity: 0.25;
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chat-log .msg {
+      animation: none;
+    }
+    .chat-log .bubble.typing::after,
+    .chat-log .bubble.dots span {
+      animation: none;
+    }
+  }
+</style>

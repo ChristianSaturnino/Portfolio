@@ -1,0 +1,119 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+import { site, type Lang } from "../data/site";
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+}
+
+const { lang, title, description } = Astro.props;
+
+const pageTitle = title ?? `${site.name} · ${site.role[lang]}`;
+const pageDesc = description ?? site.tagline[lang];
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+---
+
+<!doctype html>
+<html lang={lang === "pt" ? "pt-BR" : "en"}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonical} />
+    <meta name="author" content={site.fullName} />
+    <meta name="theme-color" content="#0a0c0f" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:locale" content={lang === "pt" ? "pt_BR" : "en_US"} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="alternate" hreflang="pt-BR" href={new URL("/", Astro.site ?? Astro.url).href} />
+    <link rel="alternate" hreflang="en" href={new URL("/en", Astro.site ?? Astro.url).href} />
+
+    <noscript><style>.reveal { opacity: 1 !important; transform: none !important; } .section-head .rule { transform: scaleX(1) !important; }</style></noscript>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">{lang === "pt" ? "Pular para o conteúdo" : "Skip to content"}</a>
+    <slot />
+
+    <style>
+      .skip-link {
+        position: absolute;
+        left: 1rem;
+        top: -3rem;
+        background: var(--accent);
+        color: var(--accent-ink);
+        padding: 0.5rem 0.9rem;
+        border-radius: 6px;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        transition: top 0.2s ease;
+        z-index: 100;
+      }
+      .skip-link:focus {
+        top: 1rem;
+      }
+    </style>
+
+    <script>
+      // header shadow on scroll
+      const header = document.querySelector("[data-header]");
+      if (header) {
+        const onScroll = () => header.toggleAttribute("data-scrolled", window.scrollY > 8);
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+      }
+
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // scroll reveal
+      const reveals = document.querySelectorAll(".reveal");
+      if (reduce || !("IntersectionObserver" in window)) {
+        reveals.forEach((el) => el.classList.add("is-in"));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-in");
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: "0px 0px -12% 0px", threshold: 0.1 }
+        );
+        reveals.forEach((el) => io.observe(el));
+      }
+
+      // scrollspy: mark the nav link for the section in view
+      const navLinks = [...document.querySelectorAll("[data-spy] a[href^='#']")];
+      const sections = navLinks
+        .map((a) => document.querySelector(a.getAttribute("href")))
+        .filter(Boolean);
+      if (sections.length) {
+        const spy = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                const id = e.target.id;
+                navLinks.forEach((a) =>
+                  a.toggleAttribute("data-active", a.getAttribute("href") === `#${id}`)
+                );
+              }
+            }
+          },
+          { rootMargin: "-45% 0px -50% 0px" }
+        );
+        sections.forEach((s) => spy.observe(s));
+      }
+    </script>
+  </body>
+</html>
