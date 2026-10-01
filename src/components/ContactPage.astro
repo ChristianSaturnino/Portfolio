@@ -1,0 +1,561 @@
+---
+import Shell from "./Shell.astro";
+import Icon, { type IconName } from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { useTranslations } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const github = site.socials.github.split("/").pop();
+const linkedin = site.socials.linkedin.replace(/^https?:\/\/(www\.)?/, "");
+
+// let long addresses wrap at "@" and "." instead of mid-word
+const breakable = (v: string) =>
+  v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/@/g, "@<wbr>").replace(/\./g, "<wbr>.");
+
+interface Channel {
+  key: string;
+  icon: IconName;
+  label: string;
+  value: string;
+  href: string;
+  copy?: string;
+  note?: string;
+  extra?: { label: string; href: string };
+}
+
+const channels: Channel[] = [
+  {
+    key: "email",
+    icon: "mail",
+    label: t("contact.email"),
+    value: site.email,
+    href: `mailto:${site.email}`,
+    copy: site.email,
+    note: t("contact.emailNote"),
+  },
+  {
+    key: "whatsapp",
+    icon: "whatsapp",
+    label: t("contact.whatsapp"),
+    value: site.phone.display,
+    href: `https://wa.me/${site.phone.e164.replace("+", "")}`,
+    copy: site.phone.display,
+    extra: { label: t("contact.phone"), href: `tel:${site.phone.e164}` },
+  },
+  {
+    key: "linkedin",
+    icon: "linkedin",
+    label: t("contact.linkedin"),
+    value: linkedin.replace("linkedin.com", ""),
+    href: site.socials.linkedin,
+  },
+  {
+    key: "github",
+    icon: "github",
+    label: t("contact.github"),
+    value: `@${github}`,
+    href: site.socials.github,
+  },
+  {
+    key: "portfolio",
+    icon: "globe",
+    label: t("contact.portfolio"),
+    value: site.portfolio,
+    href: `https://${site.portfolio}`,
+    copy: `https://${site.portfolio}`,
+  },
+];
+---
+
+<Shell
+  lang={lang}
+  page="contact"
+  title={`${t("contact.title")} · ${site.name}`}
+  description={t("contact.lead")}
+  barTitle={t("contact.title")}
+  barSub={site.email}
+>
+  <header class="hero">
+    <div class="hero-text">
+      <h1 class="display">{t("contact.hello")}</h1>
+      <p class="lead">{t("contact.lead")}</p>
+    </div>
+
+    <aside class="clock" aria-label={t("contact.localTime")}>
+      <img src="/img/christian.webp" alt="" width="64" height="64" />
+      <p class="clock-label"><Icon name="clock" />{t("contact.localTime")}</p>
+      <p class="clock-time display" data-clock data-tz={site.timeZone} data-lang={lang === "pt" ? "pt-BR" : "en-US"}>--:--</p>
+      <p class="clock-sub">{t("contact.tz")} · UTC−3</p>
+    </aside>
+  </header>
+
+  <section class="block" aria-labelledby="ch-h">
+    <h2 id="ch-h" class="display">{t("contact.channels")}</h2>
+    <ul class="grid">
+      {
+        channels.map((c) => (
+          <li class:list={["ch", `ch-${c.key}`]}>
+            <p class="ch-label">
+              <Icon name={c.icon} />
+              {c.label}
+            </p>
+            <p class="ch-value display" set:html={breakable(c.value)} />
+            {c.note && <p class="ch-note">{c.note}</p>}
+            <div class="ch-actions">
+              <a class="act act-main" href={c.href} {...(c.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}>
+                <Icon name={c.href.startsWith("http") ? "external" : "send"} />
+                {t("contact.open")}
+              </a>
+              {c.copy && (
+                <button type="button" class="act" data-copy-text={c.copy} data-done-label={t("contact.copied")}>
+                  <Icon name="copy" />
+                  <span data-label>{t("contact.copy")}</span>
+                </button>
+              )}
+              {c.extra && (
+                <a class="act" href={c.extra.href}>
+                  <Icon name="phone" />
+                  {c.extra.label}
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+
+      <li class="ch ch-vcard">
+        <p class="ch-label"><Icon name="userPlus" />{t("contact.saveContact")}</p>
+        <p class="ch-note">{t("contact.saveNote")}</p>
+        <div class="ch-actions">
+          <a class="act act-main" href="/christian-saturnino.vcf" download="christian-saturnino.vcf">
+            <Icon name="download" />
+            christian-saturnino.vcf
+          </a>
+        </div>
+      </li>
+
+      <li class="ch ch-cv">
+        <p class="ch-label"><Icon name="file" />{t("contact.resumes")}</p>
+        <div class="cv-links">
+          <a href={site.cv.pt} target="_blank" rel="noopener"><span class="display">PT</span> <Icon name="download" /></a>
+          <a href={site.cv.en} target="_blank" rel="noopener"><span class="display">EN</span> <Icon name="download" /></a>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="block" aria-labelledby="compose-h">
+    <div class="compose">
+      <div class="compose-head">
+        <h2 id="compose-h" class="display">{t("contact.compose")}</h2>
+        <p>{t("contact.composeNote")}</p>
+      </div>
+      <form data-compose data-to={site.email} data-subject={t("contact.subject")} novalidate>
+        <label>
+          <span>{t("contact.name")}</span>
+          <input name="name" type="text" autocomplete="name" placeholder={t("contact.namePh")} />
+        </label>
+        <label>
+          <span>{t("contact.message")}</span>
+          <textarea name="message" rows="5" placeholder={t("contact.messagePh")}></textarea>
+          <span class="err" data-err hidden>{t("contact.empty")}</span>
+        </label>
+        <button type="submit" class="btn btn-accent">
+          <Icon name="send" />
+          {t("contact.send")}
+        </button>
+      </form>
+    </div>
+  </section>
+</Shell>
+
+<script>
+  // live clock in Christian's time zone
+  const clock = document.querySelector<HTMLElement>("[data-clock]");
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat(clock.dataset.lang, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: clock.dataset.tz,
+    });
+    const tick = () => (clock.textContent = fmt.format(new Date()));
+    tick();
+    setInterval(tick, 15000);
+  }
+
+  // copy buttons
+  document.querySelectorAll<HTMLButtonElement>("[data-copy-text]").forEach((b) => {
+    b.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copyText!);
+      } catch {
+        return;
+      }
+      const label = b.querySelector("[data-label]");
+      const prev = label?.textContent;
+      b.dataset.done = "";
+      if (label) label.textContent = b.dataset.doneLabel ?? "";
+      setTimeout(() => {
+        delete b.dataset.done;
+        if (label) label.textContent = prev ?? "";
+      }, 1800);
+    });
+  });
+
+  // compose: hand the message to the visitor's own mail app
+  const form = document.querySelector<HTMLFormElement>("[data-compose]");
+  if (form) {
+    const msg = form.elements.namedItem("message") as HTMLTextAreaElement;
+    const name = form.elements.namedItem("name") as HTMLInputElement;
+    const err = form.querySelector<HTMLElement>("[data-err]")!;
+    msg.addEventListener("input", () => {
+      err.hidden = true;
+      msg.removeAttribute("aria-invalid");
+    });
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const body = msg.value.trim();
+      if (!body) {
+        err.hidden = false;
+        msg.setAttribute("aria-invalid", "true");
+        msg.focus();
+        return;
+      }
+      const who = name.value.trim();
+      const subject = who ? `${form.dataset.subject} · ${who}` : form.dataset.subject!;
+      location.href = `mailto:${form.dataset.to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+  }
+</script>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 2rem;
+    align-items: end;
+    padding: 2.5rem 1.5rem 2.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 {
+    font-size: clamp(3.5rem, 9vw, 6.75rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+  .lead {
+    margin-top: 1.25rem;
+    max-width: 32rem;
+    font-size: 1.08rem;
+    color: var(--ink-2);
+  }
+
+  .clock {
+    position: relative;
+    padding: 1.1rem 1.1rem 1rem;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--card);
+  }
+  .clock img {
+    position: absolute;
+    top: -1.4rem;
+    right: 1rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--card);
+  }
+  .clock-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .clock-label :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+  .clock-time {
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .clock-sub {
+    font-size: 0.78rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+  }
+
+  /* ---------- channels ---------- */
+  .block {
+    padding: 2.25rem 1.5rem 0.5rem;
+  }
+  h2 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.1rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+  .ch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.1rem 1.05rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    min-width: 0;
+    transition: border-color 0.15s ease, transform 0.2s var(--ease);
+  }
+  .ch:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-2px);
+  }
+  .ch-email {
+    grid-column: span 2;
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+  .ch-vcard {
+    grid-column: span 2;
+    border-style: dashed;
+    border-color: var(--line-strong);
+    background: transparent;
+  }
+
+  .ch-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .ch-label :global(.icon) {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+  .ch-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.15;
+    overflow-wrap: break-word;
+  }
+  .ch-email .ch-value {
+    font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+    margin-top: 0.4rem;
+  }
+  .ch-note {
+    font-size: 0.88rem;
+    opacity: 0.8;
+  }
+
+  .ch-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.6rem;
+  }
+  .act {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2.1rem;
+    padding: 0 0.85rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    border: 1px solid var(--line-strong);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .act:hover {
+    background: var(--sunk);
+  }
+  .act :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+  .act-main {
+    background: var(--ink);
+    color: var(--card);
+    border-color: var(--ink);
+  }
+  .act-main:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+  }
+  .act[data-done] {
+    color: var(--ok);
+    border-color: var(--ok);
+  }
+
+  .ch-email .act {
+    border-color: color-mix(in srgb, var(--on-accent) 45%, transparent);
+  }
+  .ch-email .act:hover {
+    background: color-mix(in srgb, var(--on-accent) 14%, transparent);
+  }
+  .ch-email .act-main {
+    background: var(--on-accent);
+    color: var(--accent-text);
+    border-color: var(--on-accent);
+  }
+  .ch-email .act-main:hover {
+    background: var(--on-accent);
+    color: var(--ink);
+  }
+  .ch-email .act[data-done] {
+    color: var(--on-accent);
+    border-color: var(--on-accent);
+  }
+
+  .cv-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.6rem;
+  }
+  .cv-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.8rem;
+    border-radius: 12px;
+    background: var(--sunk);
+    font-size: 1.3rem;
+    font-weight: 800;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .cv-links a:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  /* ---------- compose ---------- */
+  .compose {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 1.5rem;
+    padding: 1.4rem;
+    border-radius: var(--radius);
+    background: var(--sunk);
+    margin-bottom: 3rem;
+  }
+  .compose-head h2 {
+    margin-bottom: 0.5rem;
+  }
+  .compose-head p {
+    color: var(--ink-2);
+    font-size: 0.93rem;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  label > span:first-child {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  input,
+  textarea {
+    font: inherit;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.65rem 0.85rem;
+    resize: vertical;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--ink-3);
+  }
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  textarea[aria-invalid="true"] {
+    border-color: var(--accent);
+  }
+  .err {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+  .err[hidden] {
+    display: none;
+  }
+  form .btn {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    .clock {
+      max-width: 17rem;
+      margin-top: 0.5rem;
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .compose {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .hero,
+    .block {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .ch-email,
+    .ch-vcard {
+      grid-column: auto;
+    }
+    .compose {
+      padding: 1.1rem;
+    }
+  }
+</style>

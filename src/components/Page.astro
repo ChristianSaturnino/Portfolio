@@ -1,12 +1,9 @@
 ---
 import Base from "../layouts/Base.astro";
-import Header from "./Header.astro";
-import Hero from "./Hero.astro";
-import Flagship from "./Flagship.astro";
-import Experience from "./Experience.astro";
-import Projects from "./Projects.astro";
-import Skills from "./Skills.astro";
-import Contact from "./Contact.astro";
+import Sidebar from "./Sidebar.astro";
+import Profile from "./Profile.astro";
+import Feed from "./Feed.astro";
+import Rail from "./Rail.astro";
 import type { Lang } from "../data/site";
 
 interface Props {
@@ -16,13 +13,72 @@ const { lang } = Astro.props;
 ---
 
 <Base lang={lang}>
-  <Header lang={lang} />
-  <main id="main">
-    <Hero lang={lang} />
-    <Flagship lang={lang} />
-    <Experience lang={lang} />
-    <Projects lang={lang} />
-    <Skills lang={lang} />
-    <Contact lang={lang} />
-  </main>
+  <div class="app">
+    <Sidebar lang={lang} />
+    <main id="feed" class="column">
+      <Profile lang={lang} />
+      <Feed lang={lang} />
+    </main>
+    <Rail lang={lang} />
+  </div>
 </Base>
+
+<style>
+  .app {
+    display: grid;
+    grid-template-columns: var(--col-side) minmax(0, var(--col-feed)) var(--col-rail);
+    justify-content: center;
+    align-items: start;
+    min-height: 100vh;
+    padding: 0 1rem;
+  }
+  .app > :global(.side) {
+    align-self: stretch;
+    grid-row: 1 / span 2;
+  }
+  .column {
+    background: var(--card);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    min-height: 100vh;
+  }
+
+  /* laptop: rail drops under the feed, sidebar keeps its labels */
+  @media (max-width: 1240px) {
+    .app {
+      grid-template-columns: var(--col-side) minmax(0, var(--col-feed));
+    }
+    .app > :global(.rail) {
+      grid-column: 2;
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      background: var(--card);
+    }
+  }
+
+  /* tablet: icon-only sidebar */
+  @media (max-width: 1100px) {
+    .app {
+      grid-template-columns: 5rem minmax(0, var(--col-feed));
+    }
+  }
+
+  /* phone: single column under a sticky top bar */
+  @media (max-width: 700px) {
+    .app {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 0;
+      --stick: 3.1rem;
+    }
+    .app > :global(.side) {
+      grid-row: auto;
+    }
+    .app > :global(.rail) {
+      grid-column: 1;
+      border: 0;
+    }
+    .column {
+      border: 0;
+    }
+  }
+</style>

@@ -1,0 +1,171 @@
+---
+import Icon, { type IconName } from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { useTranslations } from "../i18n/ui";
+
+// Shared shell for every feed post: context line, avatar, author row, body slot, actions.
+interface Props {
+  lang: Lang;
+  id: string;
+  tabs: string[];
+  when: string;
+  context?: { icon: IconName; label: string; accent?: boolean };
+}
+const { lang, id, tabs, when, context } = Astro.props;
+const t = useTranslations(lang);
+const handle = site.socials.github.split("/").pop();
+---
+
+<article class="post" id={id} data-tabs={tabs.join(" ")} aria-labelledby={`${id}-by`}>
+  {
+    context && (
+      <p class:list={["context", { accent: context.accent }]}>
+        <Icon name={context.icon} />
+        <span>{context.label}</span>
+      </p>
+    )
+  }
+  <div class="row">
+    <img class="pic" src="/img/christian.webp" alt="" width="44" height="44" loading="lazy" />
+    <div class="main">
+      <p class="by" id={`${id}-by`}>
+        <strong>{site.name}</strong>
+        <span class="handle">@{handle}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href={`#${id}`} class="when">{when}</a>
+      </p>
+      <div class="body">
+        <slot />
+      </div>
+      <div class="actions">
+        <button type="button" data-copy={id} data-done-label={t("post.copied")}>
+          <Icon name="link" />
+          <span data-label>{t("post.copy")}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .post {
+    padding: 0.85rem 1.25rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.15s ease;
+    scroll-margin-top: 3.5rem;
+  }
+  .post:hover {
+    background: var(--card-hover);
+  }
+  .post:target {
+    background: color-mix(in srgb, var(--accent-soft) 55%, var(--card));
+  }
+
+  .context {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    margin: 0 0 0.35rem 1.5rem;
+  }
+  .context :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+  .context.accent {
+    color: var(--accent-text);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+  .pic {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--sunk);
+  }
+
+  .by {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    font-size: 0.95rem;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .by strong {
+    font-weight: 800;
+  }
+  .handle,
+  .sep,
+  .when {
+    color: var(--ink-3);
+  }
+  .handle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .when:hover {
+    text-decoration: underline;
+  }
+
+  .body {
+    margin-top: 0.15rem;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+  }
+  .actions button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-3);
+    padding: 0.35rem 0.6rem;
+    margin-right: -0.6rem;
+    border-radius: 999px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .actions button:hover {
+    color: var(--accent-text);
+    background: var(--accent-soft);
+  }
+  .actions button[data-done] {
+    color: var(--ok);
+  }
+  .actions :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  @media (max-width: 560px) {
+    .post {
+      padding: 0.8rem 1rem 0.4rem;
+    }
+    .row {
+      grid-template-columns: 2.4rem minmax(0, 1fr);
+      gap: 0.6rem;
+    }
+    .pic {
+      width: 2.4rem;
+      height: 2.4rem;
+    }
+    .context {
+      margin-left: 1.2rem;
+    }
+    .handle {
+      display: none;
+    }
+  }
+</style>

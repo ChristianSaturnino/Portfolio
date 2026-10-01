@@ -1,0 +1,192 @@
+---
+import Icon from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { skillGroups } from "../data/skills";
+import { languages } from "../data/experience";
+import { useTranslations, stackPath, contactPath, projectsPath } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const loc = (v: string | { pt: string; en: string }) => (typeof v === "string" ? v : v[lang]);
+---
+
+<aside class="rail">
+  <div class="rail-inner">
+    <section class="box" id="stack" aria-labelledby="stack-h">
+      <h2 id="stack-h" class="display">{t("rail.stack")}</h2>
+      <ul class="groups">
+        {
+          skillGroups.map((g) => (
+            <li>
+              <p class="group">{g.label[lang]}</p>
+              <ul class="chips">
+                {g.items.map((i) => (
+                  <li class="chip">{loc(i)}</li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="more" href={stackPath(lang)}>{t("stack.seeAll")} <Icon name="arrow" /></a>
+      <a class="more" href={projectsPath(lang)}>{t("projects.seeAll")} <Icon name="arrow" /></a>
+    </section>
+
+    <section class="box" aria-labelledby="lang-h">
+      <h2 id="lang-h" class="display">{t("rail.languages")}</h2>
+      <ul class="langs">
+        {
+          languages.map((l) => (
+            <li>
+              <span>{l.label[lang]}</span>
+              <span class="lvl">{l.level[lang]}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="box contact" id="contact" aria-labelledby="contact-h">
+      <h2 id="contact-h" class="display">{t("rail.contact")}</h2>
+      <p>{t("rail.contactBody")}</p>
+      <a class="btn btn-accent" href={`mailto:${site.email}`}>
+        <Icon name="mail" />
+        {t("cta.message")}
+      </a>
+      <p class="mail">{site.email}</p>
+      <div class="socials">
+        <a class="btn btn-ghost" href={site.socials.github} target="_blank" rel="noopener"><Icon name="github" />GitHub</a>
+        <a class="btn btn-ghost" href={site.socials.linkedin} target="_blank" rel="noopener"><Icon name="linkedin" />LinkedIn</a>
+      </div>
+      <a class="more" href={contactPath(lang)}>{t("contact.seeAll")} <Icon name="arrow" /></a>
+    </section>
+
+    <p class="foot">
+      <a href={site.socials.github} target="_blank" rel="noopener">{t("footer.built")}</a>
+      <span>© {new Date().getFullYear()} {site.name}</span>
+    </p>
+  </div>
+</aside>
+
+<style>
+  .rail-inner {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0 1.5rem 1.5rem;
+  }
+
+  .box {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem 1.1rem;
+    scroll-margin-top: 1rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 0.7rem;
+  }
+
+  .groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .group {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    margin-bottom: 0.35rem;
+  }
+
+  .more {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-text);
+  }
+  .more :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.15s var(--ease);
+  }
+  .more + .more {
+    margin-top: 0.45rem;
+  }
+  .more:hover :global(.icon) {
+    transform: translateX(3px);
+  }
+
+  .langs li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    font-weight: 600;
+  }
+  .langs li + li {
+    border-top: 1px solid var(--line);
+  }
+  .lvl {
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+
+  .contact p {
+    font-size: 0.93rem;
+    color: var(--ink-2);
+  }
+  .contact .btn-accent {
+    width: 100%;
+    margin-top: 0.9rem;
+  }
+  .contact .mail {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+    margin-top: 0.4rem;
+    overflow-wrap: anywhere;
+  }
+  .socials {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+  .socials .btn {
+    height: 2.25rem;
+    font-size: 0.85rem;
+    padding: 0 0.7rem;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.8rem;
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    padding: 0 0.25rem;
+  }
+  .foot a:hover {
+    text-decoration: underline;
+  }
+
+  /* below the 3-column breakpoint the rail flows under the feed */
+  @media (max-width: 1240px) {
+    .rail-inner {
+      position: static;
+      padding: 1rem;
+    }
+  }
+</style>

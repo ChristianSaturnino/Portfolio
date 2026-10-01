@@ -1,0 +1,253 @@
+---
+import Icon, { type IconName } from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { useTranslations, homePath, stackPath, contactPath, projectsPath, pagePath, type Page } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  page?: Page;
+}
+const { lang, page = "home" } = Astro.props;
+const t = useTranslations(lang);
+const other: Lang = lang === "pt" ? "en" : "pt";
+
+const home = homePath(lang);
+const links: { href: string; label: string; icon: IconName; external?: boolean; active?: boolean }[] = [
+  { href: `${home}#feed`, label: t("nav.feed"), icon: "home", active: page === "home" },
+  { href: projectsPath(lang), label: t("nav.projects"), icon: "apps", active: page === "projects" },
+  { href: stackPath(lang), label: t("nav.stack"), icon: "stack", active: page === "stack" },
+  { href: contactPath(lang), label: t("nav.contact"), icon: "message", active: page === "contact" },
+  { href: site.cv[lang], label: t("nav.resume"), icon: "file", external: true },
+  { href: site.socials.github, label: "GitHub", icon: "github", external: true },
+  { href: site.socials.linkedin, label: "LinkedIn", icon: "linkedin", external: true },
+];
+---
+
+<aside class="side">
+  <div class="side-inner">
+    <a href={homePath(lang)} class="brand" aria-label={site.name}>
+      <img src="/img/christian.webp" alt="" width="40" height="40" />
+      <span class="display">Christian<span class="dot">.</span></span>
+    </a>
+
+    <nav aria-label={lang === "pt" ? "Navegação" : "Navigation"}>
+      <ul>
+        {links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              aria-current={l.active ? "page" : undefined}
+              {...(l.external ? { target: "_blank", rel: "noopener" } : {})}
+            >
+              <Icon name={l.icon} />
+              <span>{l.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <a class:list={["bar-link", "bar-first", { on: page === "projects" }]} href={projectsPath(lang)} aria-label={t("nav.projects")}>
+      <Icon name="apps" />
+    </a>
+    <a class:list={["bar-link", { on: page === "stack" }]} href={stackPath(lang)} aria-label={t("nav.stack")}>
+      <Icon name="stack" />
+    </a>
+
+    <a class="btn btn-accent cta" href={`mailto:${site.email}`}>
+      <Icon name="mail" />
+      <span>{t("cta.message")}</span>
+    </a>
+
+    <a class="lang" href={pagePath(other, page)} hreflang={other} aria-label={t("lang.switchLabel")}>
+      <Icon name="globe" />
+      <span class:list={{ on: lang === "pt" }}>PT</span>
+      <span class:list={{ on: lang === "en" }}>EN</span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .side {
+    position: relative;
+  }
+  .side-inner {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.25rem 1.25rem 1.5rem 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    margin-left: -0.5rem;
+  }
+  .brand img {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .dot {
+    color: var(--accent);
+  }
+
+  nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.6rem 1rem 0.6rem 0.75rem;
+    margin-left: -0.75rem;
+    border-radius: 999px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+  nav a:hover {
+    background: var(--sunk);
+  }
+  nav a[aria-current="page"] {
+    font-weight: 800;
+  }
+  nav a[aria-current="page"] :global(.icon) {
+    color: var(--accent);
+  }
+
+  /* projects/stack shortcuts, only shown in the phone top bar */
+  .bar-link {
+    display: none;
+  }
+  nav :global(.icon) {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .cta {
+    height: 3rem;
+    font-size: 1rem;
+  }
+
+  .lang {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    padding: 0.4rem 0.8rem 0.4rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    transition: border-color 0.15s ease;
+  }
+  .lang:hover {
+    border-color: var(--line-strong);
+  }
+  .lang .on {
+    color: var(--ink);
+  }
+
+  /* tablet: icon-only rail */
+  @media (max-width: 1100px) {
+    .side-inner {
+      align-items: center;
+      padding-right: 0.75rem;
+    }
+    .brand span,
+    nav span,
+    .cta span {
+      display: none;
+    }
+    .brand {
+      margin: 0;
+    }
+    nav a {
+      margin: 0;
+      padding: 0.75rem;
+    }
+    .cta {
+      width: 3rem;
+      padding: 0;
+    }
+    .lang {
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0.5rem;
+      align-self: center;
+    }
+    .lang :global(.icon) {
+      display: none;
+    }
+  }
+
+  /* phone: slim sticky top bar */
+  @media (max-width: 700px) {
+    .side {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .side-inner {
+      position: static;
+      min-height: 0;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+    }
+    .brand span {
+      display: inline;
+      font-size: 1.15rem;
+    }
+    .brand img {
+      width: 2rem;
+      height: 2rem;
+    }
+    nav {
+      display: none;
+    }
+    .bar-link {
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+    }
+    .bar-first {
+      margin-left: auto;
+    }
+    .bar-link.on {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .cta {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+    .lang {
+      margin: 0;
+      flex-direction: row;
+      padding: 0.45rem 0.7rem;
+    }
+  }
+</style>

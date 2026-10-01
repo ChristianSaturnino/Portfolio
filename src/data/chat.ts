@@ -6,7 +6,7 @@ export interface ChatTurn {
 }
 
 // Looping "ask me" demo shown under the portrait. Read-only, no input.
-// The bot answers as Christian, a nod to the MarIA agent work.
+// The bot answers as Christian, a nod to the Maria agent work.
 export const chatScript: Record<Lang, ChatTurn[]> = {
   pt: [
     {
@@ -15,11 +15,11 @@ export const chatScript: Record<Lang, ChatTurn[]> = {
     },
     {
       q: "no que você trabalha?",
-      a: "Na Pedbot eu construo o MarIA, o maior agente de vendas com IA do varejo farmacêutico do Brasil.",
+      a: "Hoje sou dev full stack pleno na Funcional Health Tech, com NestJS e React. Antes, na Pedbot, ajudei a construir a Maria, agente de vendas com IA que operou nos maiores players do varejo farmacêutico.",
     },
     {
       q: "qual é a sua stack?",
-      a: "Back-end de alta performance, sistemas distribuídos e agentes LLM com NestJS e LangGraph.",
+      a: "TypeScript e NestJS no back-end, React no front, RabbitMQ e Redis para sistemas distribuídos, e LangGraph para agentes LLM.",
     },
     {
       q: "o que você mais curte fazer?",
@@ -33,11 +33,11 @@ export const chatScript: Record<Lang, ChatTurn[]> = {
     },
     {
       q: "what do you work on?",
-      a: "At Pedbot I build MarIA, the largest AI sales agent in Brazilian pharma retail.",
+      a: "I'm a mid-level full stack developer at Funcional Health Tech, working with NestJS and React. Before that, at Pedbot, I helped build Maria, an AI sales agent that ran at the largest players in pharmaceutical retail.",
     },
     {
       q: "what's your stack?",
-      a: "High-performance back-ends, distributed systems and LLM agents with NestJS and LangGraph.",
+      a: "TypeScript and NestJS on the back-end, React on the front, RabbitMQ and Redis for distributed systems, and LangGraph for LLM agents.",
     },
     {
       q: "what do you enjoy most?",

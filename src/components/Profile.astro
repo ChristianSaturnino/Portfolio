@@ -1,0 +1,190 @@
+---
+import Icon from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { feed, stats, formatDate } from "../data/feed";
+import { experience } from "../data/experience";
+import { useTranslations } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const handle = site.socials.github.split("/").pop();
+---
+
+<header class="profile">
+  <div class="banner" aria-hidden="true">
+    <p class="display">{site.tagline[lang]}</p>
+  </div>
+
+  <div class="top">
+    <img class="avatar" src="/img/christian.webp" alt={site.name} width="400" height="400" />
+    <div class="actions">
+      <a class="btn btn-ghost" href={site.cv[lang]} target="_blank" rel="noopener">
+        <Icon name="file" />
+        {t("nav.resume")}
+      </a>
+      <a class="btn btn-accent" href={`mailto:${site.email}`}>{t("cta.message")}</a>
+    </div>
+  </div>
+
+  <div class="who">
+    <h1 class="display">{site.name}</h1>
+    <a class="handle" href={site.socials.github} target="_blank" rel="noopener">@{handle}</a>
+  </div>
+
+  <p class="bio">{site.intro[lang]}</p>
+
+  <ul class="meta">
+    <li><Icon name="briefcase" />{site.role[lang]} · {experience[0].company}</li>
+    <li><Icon name="mapPin" />{site.location[lang]}</li>
+    <li><Icon name="calendar" />{t("profile.since")} {formatDate(stats.since, lang)}</li>
+  </ul>
+
+  <ul class="stats">
+    <li><strong>{feed.length}</strong> {t("profile.posts")}</li>
+    <li><strong>{stats.roles}</strong> {t("profile.roles")}</li>
+    <li><strong>{stats.products}</strong> {t("profile.products")}</li>
+    <li><strong>{stats.certs}</strong> {t("profile.certs")}</li>
+  </ul>
+</header>
+
+<style>
+  .profile {
+    padding-bottom: 1.1rem;
+  }
+
+  .banner {
+    position: relative;
+    height: 12.5rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.25rem 1.5rem 1.4rem 10.5rem;
+    overflow: hidden;
+  }
+  /* faint dot grid so the block of color has some texture */
+  .banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(color-mix(in srgb, var(--on-accent) 22%, transparent) 1px, transparent 1.2px);
+    background-size: 14px 14px;
+    mask-image: linear-gradient(to left, #000, transparent 75%);
+  }
+  .banner p {
+    position: relative;
+    font-size: clamp(1.35rem, 3.2vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+  }
+  .avatar {
+    width: 8.25rem;
+    height: 8.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--card);
+    margin-top: -4.4rem;
+    position: relative;
+    background: var(--sunk);
+  }
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+  }
+
+  .who {
+    padding: 0.6rem 1.25rem 0;
+  }
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  .handle {
+    color: var(--ink-3);
+    font-size: 0.95rem;
+  }
+  .handle:hover {
+    color: var(--accent-text);
+  }
+
+  .bio {
+    padding: 0.8rem 1.25rem 0;
+    font-size: 1rem;
+    max-width: 38rem;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    padding: 0.8rem 1.25rem 0;
+    color: var(--ink-3);
+    font-size: 0.9rem;
+  }
+  .meta li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .meta :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    padding: 0.7rem 1.25rem 0;
+    font-size: 0.9rem;
+    color: var(--ink-3);
+  }
+  .stats strong {
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  @media (max-width: 560px) {
+    .banner {
+      height: auto;
+      min-height: 9rem;
+      padding: 1.1rem 1rem 3.5rem;
+    }
+    .top {
+      padding: 0 1rem;
+    }
+    .avatar {
+      width: 5.75rem;
+      height: 5.75rem;
+      margin-top: -2.9rem;
+    }
+    .actions .btn {
+      height: 2.25rem;
+      padding: 0 0.9rem;
+      font-size: 0.85rem;
+    }
+    .actions .btn-ghost :global(.icon) {
+      display: none;
+    }
+    .who,
+    .bio,
+    .meta,
+    .stats {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+</style>

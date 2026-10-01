@@ -18,11 +18,14 @@ Tudo em `src/data/` — não precisa mexer em componente pra atualizar texto:
 
 | Arquivo | O quê |
 |---|---|
-| `site.ts` | Nome, cargo, tagline, intro, e-mail, redes, links do CV |
+| `site.ts` | Nome, cargo, tagline, intro, e-mail, telefone, domínio, redes, links do CV |
 | `experience.ts` | Empregos, formação, certificações, idiomas |
-| `projects.ts` | Projetos (título, resumo, papel, stack, links, status) |
+| `projects.ts` | Projetos (título, resumo, papel, stack, links, status, prints em `public/img/projects/`) |
 | `skills.ts` | Grupos de skills |
-| `src/i18n/ui.ts` | Textos de interface (labels de seção, botões, nav) |
+| `feed.ts` | Ordem da timeline e em qual aba cada post aparece (monta os posts a partir dos outros arquivos) |
+| `chat.ts` | Fio de perguntas e respostas |
+| `stack.ts` | Página `/stack`: quais skills são "dia a dia" e apelidos usados para achar em quais posts cada tecnologia aparece |
+| `src/i18n/ui.ts` | Textos de interface (abas, botões, nav) |
 
 Cada campo de texto tem `{ pt: "...", en: "..." }`. Adicionar um projeto = adicionar um objeto no array de `projects.ts`.
 
@@ -33,10 +36,17 @@ src/
   data/            conteúdo (fonte da verdade)
   i18n/ui.ts       strings de interface + helper de tradução
   layouts/Base.astro   <head>, fontes, SEO/OG, tema
-  components/      Header, Hero, Experience, Projects, Skills, Contact, Page
+  components/      Page, Shell, ProjectsPage, StackPage, ContactPage, Sidebar, Profile, Feed, Post, Rail, Icon
   pages/
     index.astro    rota PT  (/)
     en/index.astro rota EN  (/en)
+    stack.astro    página de stack PT (/stack)
+    en/stack.astro página de stack EN (/en/stack)
+    projetos.astro página de projetos PT (/projetos)
+    en/projects.astro página de projetos EN (/en/projects)
+    contato.astro  página de contato PT (/contato)
+    en/contact.astro página de contato EN (/en/contact)
+    christian-saturnino.vcf.ts  cartão de visita gerado no build
   styles/global.css  design system (tokens em :root)
 public/
   cv/              PDFs do currículo
@@ -45,7 +55,7 @@ public/
 
 ## Design
 
-Tema escuro único. Tokens no `:root` de `src/styles/global.css` — trocar `--accent` muda a cor de destaque do site inteiro.
+Layout de feed (estilo timeline social): sidebar, perfil + timeline filtrável, coluna com stack e contato. Cada marco (cargo, projeto, certificação) é um post; a Maria fica fixada no topo. Claro por padrão, escuro via `prefers-color-scheme`. Tokens no `:root` de `src/styles/global.css`; trocar `--accent` muda a cor de destaque do site inteiro.
 
 ## Deploy
 

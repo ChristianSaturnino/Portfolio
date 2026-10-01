@@ -4,15 +4,20 @@ export const site = {
   name: "Christian Saturnino",
   fullName: "Christian Saturnino Andrade Oliveira",
   role: {
-    pt: "Engenheiro de Software",
-    en: "Software Engineer",
+    pt: "Engenheiro de Software · Backend & IA",
+    en: "Software Engineer · Backend & AI",
   },
   location: {
     pt: "Marília, SP · Brasil",
     en: "Marília, Brazil",
   },
-  // TODO(christian): confirmar e-mail publico (usando o do curriculo por enquanto)
   email: "christian.saturnino95@hotmail.com",
+  phone: {
+    display: "+55 14 99110-2017",
+    e164: "+5514991102017",
+  },
+  portfolio: "christiansaturnino.com.br",
+  timeZone: "America/Sao_Paulo",
   socials: {
     github: "https://github.com/ChristianSaturnino",
     linkedin: "https://linkedin.com/in/christian-saturnino",
@@ -26,7 +31,7 @@ export const site = {
     en: "I build microservices and LLM agents that run in production.",
   },
   intro: {
-    pt: "Engenheiro de software focado em back-end de alta performance, arquitetura distribuída e integração de agentes de IA. Hoje trabalho no maior agente de vendas com IA do varejo farmacêutico do Brasil. Também construo produtos completos de ponta a ponta, do pipeline de dados ao app publicado.",
-    en: "Software engineer focused on high-performance back-ends, distributed architecture and AI agent integration. I currently work on the largest AI sales agent in Brazilian pharma retail. I also build complete products end to end, from the data pipeline to the published app.",
+    pt: "Engenheiro de software com experiência em back-end, sistemas distribuídos e agentes de IA em produção, com progressão de estagiário a desenvolvedor pleno. Trabalho com TypeScript, Node.js/NestJS, React, PostgreSQL, Redis e RabbitMQ, e construo agentes com LangGraph, modelos GPT, tool calling e engenharia de prompts.",
+    en: "Software engineer with experience in back-end development, distributed systems and AI agents in production, progressing from intern to mid-level developer. I work with TypeScript, Node.js/NestJS, React, PostgreSQL, Redis and RabbitMQ, and build agents with LangGraph, GPT models, tool calling and prompt engineering.",
   },
 } as const;

@@ -3,20 +3,29 @@ export interface SkillGroup {
   items: { pt: string; en: string }[] | string[];
 }
 
-// neutral tech terms are plain strings; the two that differ per language use {pt,en}
+// neutral tech terms are plain strings; the ones that differ per language use {pt,en}
 export const skillGroups: SkillGroup[] = [
   {
-    label: { pt: "Back-end & APIs", en: "Back-end & APIs" },
-    items: ["Node.js", "NestJS", "Express", "TypeScript", "PHP / Laravel", "Python", "REST", "GraphQL"],
+    label: { pt: "Linguagens", en: "Languages" },
+    items: ["TypeScript", "Python", "PHP", "C#"],
   },
   {
-    label: { pt: "IA & Agentes LLM", en: "AI & LLM Agents" },
+    label: { pt: "Back-end", en: "Back-end" },
+    items: ["Node.js", "NestJS", "Express", "Laravel", "REST", "GraphQL"],
+  },
+  {
+    label: { pt: "Front-end", en: "Front-end" },
+    items: ["React", "Vue.js"],
+  },
+  {
+    label: { pt: "IA", en: "AI" },
     items: [
       "LangGraph",
       "LangChain",
       "OpenAI API",
       { pt: "Agentes LLM", en: "LLM Agents" },
-      { pt: "Engenharia de Prompt", en: "Prompt Engineering" },
+      { pt: "Engenharia de Prompts", en: "Prompt Engineering" },
+      "Tool Calling",
     ],
   },
   {
@@ -24,15 +33,15 @@ export const skillGroups: SkillGroup[] = [
     items: ["PostgreSQL", "MySQL", "SQL Server", "Redis", "RabbitMQ"],
   },
   {
-    label: { pt: "Infra & DevOps", en: "Infra & DevOps" },
-    items: ["Docker", "Google Cloud", "CI/CD", "Git"],
-  },
-  {
-    label: { pt: "Arquitetura", en: "Architecture" },
+    label: { pt: "Infra & Arquitetura", en: "Infra & Architecture" },
     items: [
+      "Docker",
+      "GCP",
+      "CI/CD",
+      "Git",
+      "SOLID",
       { pt: "Microsserviços", en: "Microservices" },
       { pt: "Arquitetura Distribuída", en: "Distributed Architecture" },
-      "SOLID",
     ],
   },
 ];

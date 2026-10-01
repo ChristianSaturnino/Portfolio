@@ -1,0 +1,463 @@
+---
+import Shell from "./Shell.astro";
+import Icon from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { areas, allTech, coreTech } from "../data/stack";
+import { useTranslations, homePath } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const home = homePath(lang);
+const pad = (n: number) => String(n).padStart(2, "0");
+const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+---
+
+<Shell
+  lang={lang}
+  page="stack"
+  title={`${t("stack.title")} · ${site.name}`}
+  description={t("stack.lead")}
+  barTitle={t("stack.title")}
+  barSub={`${allTech.length} ${t("stack.tech")}`}
+>
+      <header class="hero">
+        <h1 class="display">
+          {t("stack.title")}<sup>{allTech.length}</sup>
+        </h1>
+        <p class="lead">{t("stack.lead")}</p>
+        <ul class="stats">
+          <li><strong>{allTech.length}</strong> {t("stack.tech")}</li>
+          <li><strong>{areas.length}</strong> {t("stack.areas")}</li>
+          <li><strong>{coreTech.length}</strong> {t("stack.core").toLowerCase()}</li>
+        </ul>
+      </header>
+
+      <div class="marquee" aria-hidden="true">
+        {
+          [0, 1].map(() => (
+            <ul>
+              {allTech.map((x) => (
+                <li class="display">{x.name[lang]}</li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+
+      <section class="block" aria-labelledby="core-h">
+        <div class="block-head">
+          <h2 id="core-h" class="display">{t("stack.core")}</h2>
+          <p>{t("stack.coreNote")}</p>
+        </div>
+        <ul class="core">
+          {
+            coreTech.map((x, i) => (
+              <li class:list={["core-tile", { wide: i === 0 }]}>
+                <span class="core-n mono">{pad(i + 1)}</span>
+                <p class="core-name display">{x.name[lang]}</p>
+                {x.usedIn.length > 0 && (
+                  <p class="core-used">
+                    {t("stack.usedIn")} <strong>{x.usedIn.length}</strong> {t("stack.posts")}
+                  </p>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="area-h">
+        <div class="block-head">
+          <h2 id="area-h" class="display">{t("stack.byArea")}</h2>
+        </div>
+        <nav class="jump" aria-label={t("stack.byArea")}>
+          {
+            areas.map((a) => (
+              <a href={`#${slug(a.label.en)}`}>
+                {a.label[lang]} <span>{a.items.length}</span>
+              </a>
+            ))
+          }
+        </nav>
+
+        {
+          areas.map((a, ai) => (
+            <section class="area" id={slug(a.label.en)} aria-labelledby={`${slug(a.label.en)}-h`}>
+              <h3 id={`${slug(a.label.en)}-h`}>
+                <span class="area-n mono">{pad(ai + 1)}</span>
+                <span class="display">{a.label[lang]}</span>
+                <span class="area-c">{a.items.length}</span>
+              </h3>
+              <ul class="tiles">
+                {a.items.map((x) => (
+                  <li class:list={["tile", { core: x.core }]}>
+                    <div class="tile-top">
+                      <p class="tile-name display">{x.name[lang]}</p>
+                      {x.core && <span class="tag">{t("stack.core").toLowerCase()}</span>}
+                    </div>
+                    {x.usedIn.length > 0 && (
+                      <div class="used">
+                        <p class="used-label">{t("stack.usedIn")}</p>
+                        <ul>
+                          {x.usedIn.map((u) => (
+                            <li>
+                              <a href={`${home}#${u.id}`} title={u.label[lang]}>
+                                {u.label[lang]}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </section>
+
+      <footer class="end">
+        <a class="btn btn-ghost" href={home}>
+          <Icon name="home" />
+          {t("stack.back")}
+        </a>
+        <a class="btn btn-accent" href={`mailto:${site.email}`}>
+          <Icon name="mail" />
+          {t("cta.message")}
+        </a>
+      </footer>
+</Shell>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero {
+    padding: 2.5rem 1.5rem 2rem;
+  }
+  h1 {
+    font-size: clamp(4.5rem, 14vw, 9.5rem);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+  }
+  h1 sup {
+    font-size: 0.28em;
+    letter-spacing: 0;
+    color: var(--accent-text);
+    vertical-align: top;
+    margin-left: 0.15em;
+    position: relative;
+    top: 0.25em;
+  }
+  .lead {
+    margin-top: 1.25rem;
+    max-width: 34rem;
+    font-size: 1.08rem;
+    color: var(--ink-2);
+  }
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    margin-top: 1rem;
+    font-size: 0.92rem;
+    color: var(--ink-3);
+  }
+  .stats strong {
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  /* ---------- marquee ---------- */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    background: var(--accent);
+    color: var(--on-accent);
+    border-block: 1px solid var(--accent);
+    padding: 0.85rem 0;
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+  .marquee ul {
+    display: flex;
+    flex: none;
+    gap: 0;
+    animation: slide 60s linear infinite;
+  }
+  .marquee li {
+    flex: none;
+    font-size: 1.5rem;
+    font-weight: 800;
+    white-space: nowrap;
+    padding: 0 0.9rem;
+  }
+  .marquee li::after {
+    content: "✱";
+    font-size: 0.8em;
+    margin-left: 1.8rem;
+    opacity: 0.6;
+  }
+  @keyframes slide {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* ---------- blocks ---------- */
+  .block {
+    padding: 2.25rem 1.5rem 0.5rem;
+  }
+  .block-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-bottom: 1.1rem;
+  }
+  h2 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .block-head p {
+    color: var(--ink-3);
+    font-size: 0.95rem;
+  }
+
+  /* day-to-day: inverted bento */
+  .core {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+  .core-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 8.5rem;
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--card);
+    overflow: hidden;
+    transition: transform 0.2s var(--ease), background 0.2s ease;
+  }
+  .core-tile:hover {
+    transform: translateY(-3px);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .core-tile.wide {
+    grid-column: span 2;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .core-tile.wide .core-name {
+    font-size: 2.6rem;
+  }
+  .core-n {
+    position: absolute;
+    top: 0.8rem;
+    left: 1rem;
+    font-size: 0.75rem;
+    opacity: 0.55;
+  }
+  .core-name {
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+  .core-used {
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    opacity: 0.7;
+  }
+
+  /* jump links */
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+  .jump a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .jump a:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .jump span {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  /* areas */
+  .area {
+    padding-top: 1.75rem;
+    scroll-margin-top: calc(var(--stick, 0px) + 4rem);
+  }
+  h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding-bottom: 0.65rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .area-n {
+    font-size: 0.8rem;
+    color: var(--accent-text);
+  }
+  h3 .display {
+    font-size: 1.45rem;
+    font-weight: 800;
+  }
+  .area-c {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--ink-3);
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+    gap: 0.6rem;
+  }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    transition: border-color 0.15s ease, transform 0.2s var(--ease), background 0.15s ease;
+  }
+  .tile:hover {
+    border-color: var(--line-strong);
+    background: var(--card-hover);
+    transform: translateY(-2px);
+  }
+  .tile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .tile-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+  .tile.core .tile-name::before {
+    content: "";
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 0.45rem;
+    vertical-align: 0.2em;
+  }
+  .tag {
+    flex: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    background: var(--accent-soft);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .used {
+    margin-top: auto;
+  }
+  .used-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 0.35rem;
+  }
+  .used ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .used a {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 0.75rem;
+    position: relative;
+  }
+  .used a::before {
+    content: "↳";
+    position: absolute;
+    left: 0;
+    color: var(--ink-3);
+  }
+  .used a:hover {
+    color: var(--accent-text);
+    text-decoration: underline;
+  }
+
+  .end {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 3rem 1.5rem 3.5rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 860px) {
+    .core {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .hero,
+    .block {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .core-tile {
+      min-height: 7rem;
+    }
+    .core-tile.wide .core-name {
+      font-size: 2rem;
+    }
+    .marquee li {
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee ul {
+      animation: none;
+    }
+  }
+</style>

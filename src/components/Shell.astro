@@ -1,0 +1,118 @@
+---
+import Base from "../layouts/Base.astro";
+import Sidebar from "./Sidebar.astro";
+import Icon from "./Icon.astro";
+import type { Lang } from "../data/site";
+import type { Page } from "../i18n/ui";
+import { useTranslations, homePath } from "../i18n/ui";
+
+// Frame for the standalone pages (stack, contact): sidebar, one wide column
+// and a sticky top bar with a back arrow to the feed.
+interface Props {
+  lang: Lang;
+  page: Page;
+  title: string;
+  description: string;
+  barTitle: string;
+  barSub: string;
+}
+const { lang, page, title, description, barTitle, barSub } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Base lang={lang} title={title} description={description}>
+  <div class="app">
+    <Sidebar lang={lang} page={page} />
+
+    <main id="feed" class="column">
+      <div class="topbar">
+        <a href={homePath(lang)} class="back" aria-label={t("stack.back")}>
+          <Icon name="arrow" />
+        </a>
+        <div>
+          <p class="tb-title display">{barTitle}</p>
+          <p class="tb-sub">{barSub}</p>
+        </div>
+      </div>
+
+      <slot />
+    </main>
+  </div>
+</Base>
+
+<style>
+  .app {
+    display: grid;
+    grid-template-columns: var(--col-side) minmax(0, 940px);
+    justify-content: center;
+    align-items: start;
+    min-height: 100vh;
+    padding: 0 1rem;
+  }
+  .app > :global(.side) {
+    align-self: stretch;
+  }
+  .column {
+    background: var(--card);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    min-height: 100vh;
+  }
+
+  .topbar {
+    position: sticky;
+    top: var(--stick, 0px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 0.45rem 1.25rem;
+    background: color-mix(in srgb, var(--card) 86%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .back {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    transition: background 0.15s ease;
+  }
+  .back:hover {
+    background: var(--sunk);
+  }
+  .back :global(.icon) {
+    transform: rotate(180deg);
+  }
+  .tb-title {
+    font-weight: 800;
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+  .tb-sub {
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 1100px) {
+    .app {
+      grid-template-columns: 5rem minmax(0, 940px);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .app {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 0;
+      --stick: 3.1rem;
+    }
+    .column {
+      border: 0;
+    }
+    .topbar {
+      padding: 0.4rem 1rem;
+    }
+  }
+</style>

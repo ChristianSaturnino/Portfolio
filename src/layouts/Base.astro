@@ -1,8 +1,10 @@
 ---
-import "@fontsource-variable/inter";
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/hanken-grotesk";
 import "@fontsource-variable/jetbrains-mono";
 import "../styles/global.css";
 import { site, type Lang } from "../data/site";
+import { useTranslations } from "../i18n/ui";
 
 interface Props {
   lang: Lang;
@@ -11,6 +13,7 @@ interface Props {
 }
 
 const { lang, title, description } = Astro.props;
+const t = useTranslations(lang);
 
 const pageTitle = title ?? `${site.name} · ${site.role[lang]}`;
 const pageDesc = description ?? site.tagline[lang];
@@ -27,7 +30,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
     <meta name="description" content={pageDesc} />
     <link rel="canonical" href={canonical} />
     <meta name="author" content={site.fullName} />
-    <meta name="theme-color" content="#0a0c0f" />
+    <meta name="theme-color" content="#f1ede3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
@@ -37,11 +41,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 
     <link rel="alternate" hreflang="pt-BR" href={new URL("/", Astro.site ?? Astro.url).href} />
     <link rel="alternate" hreflang="en" href={new URL("/en", Astro.site ?? Astro.url).href} />
-
-    <noscript><style>.reveal { opacity: 1 !important; transform: none !important; } .section-head .rule { transform: scaleX(1) !important; }</style></noscript>
   </head>
   <body>
-    <a href="#main" class="skip-link">{lang === "pt" ? "Pular para o conteúdo" : "Skip to content"}</a>
+    <a href="#feed" class="skip-link">{t("skip")}</a>
     <slot />
 
     <style>
@@ -50,11 +52,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
         left: 1rem;
         top: -3rem;
         background: var(--accent);
-        color: var(--accent-ink);
+        color: var(--on-accent);
         padding: 0.5rem 0.9rem;
-        border-radius: 6px;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
         transition: top 0.2s ease;
         z-index: 100;
       }
@@ -64,56 +66,45 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
     </style>
 
     <script>
-      // header shadow on scroll
-      const header = document.querySelector("[data-header]");
-      if (header) {
-        const onScroll = () => header.toggleAttribute("data-scrolled", window.scrollY > 8);
-        onScroll();
-        window.addEventListener("scroll", onScroll, { passive: true });
-      }
+      // feed filter tabs: shown only when JS runs, so no-JS visitors get the full feed
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>("[data-tab]")];
+      const posts = [...document.querySelectorAll<HTMLElement>("[data-tabs]")];
+      document.querySelector("[data-tablist]")?.removeAttribute("hidden");
 
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const select = (tab: string) => {
+        tabs.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
+        posts.forEach((p) => {
+          p.hidden = tab !== "all" && !p.dataset.tabs!.split(" ").includes(tab);
+        });
+      };
+      tabs.forEach((b) =>
+        b.addEventListener("click", () => {
+          select(b.dataset.tab!);
+          const top = document.getElementById("timeline");
+          if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: "start" });
+        })
+      );
 
-      // scroll reveal
-      const reveals = document.querySelectorAll(".reveal");
-      if (reduce || !("IntersectionObserver" in window)) {
-        reveals.forEach((el) => el.classList.add("is-in"));
-      } else {
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const e of entries) {
-              if (e.isIntersecting) {
-                e.target.classList.add("is-in");
-                io.unobserve(e.target);
-              }
-            }
-          },
-          { rootMargin: "0px 0px -12% 0px", threshold: 0.1 }
-        );
-        reveals.forEach((el) => io.observe(el));
-      }
-
-      // scrollspy: mark the nav link for the section in view
-      const navLinks = [...document.querySelectorAll("[data-spy] a[href^='#']")];
-      const sections = navLinks
-        .map((a) => document.querySelector(a.getAttribute("href")))
-        .filter(Boolean);
-      if (sections.length) {
-        const spy = new IntersectionObserver(
-          (entries) => {
-            for (const e of entries) {
-              if (e.isIntersecting) {
-                const id = e.target.id;
-                navLinks.forEach((a) =>
-                  a.toggleAttribute("data-active", a.getAttribute("href") === `#${id}`)
-                );
-              }
-            }
-          },
-          { rootMargin: "-45% 0px -50% 0px" }
-        );
-        sections.forEach((s) => spy.observe(s));
-      }
+      // copy a post's permalink
+      document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((b) => {
+        b.addEventListener("click", async () => {
+          const url = `${location.origin}${location.pathname}#${b.dataset.copy}`;
+          try {
+            await navigator.clipboard.writeText(url);
+          } catch {
+            location.hash = b.dataset.copy!;
+            return;
+          }
+          b.dataset.done = "";
+          const label = b.querySelector("[data-label]");
+          const prev = label?.textContent;
+          if (label) label.textContent = b.dataset.doneLabel ?? "";
+          setTimeout(() => {
+            delete b.dataset.done;
+            if (label) label.textContent = prev ?? "";
+          }, 1800);
+        });
+      });
     </script>
   </body>
 </html>

@@ -1,0 +1,614 @@
+---
+import Post from "./Post.astro";
+import Icon from "./Icon.astro";
+import { feed, formatDate, type Tab } from "../data/feed";
+import { flagship } from "../data/flagship";
+import { chatScript } from "../data/chat";
+import type { Lang } from "../data/site";
+import { useTranslations, projectsPath, type UIKey } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const loc = <T extends string | { pt: string; en: string }>(v: T) => (typeof v === "string" ? v : v[lang]);
+
+const tabs: Tab[] = ["all", "career", "projects", "study"];
+const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.tabs.includes(tab)).length);
+---
+
+<section class="feed" aria-label={t("nav.feed")}>
+  <div id="timeline"></div>
+  <div class="tabs" role="group" aria-label={t("tabs.label")} data-tablist hidden>
+    {
+      tabs.map((tab) => (
+        <button type="button" data-tab={tab} aria-pressed={String(tab === "all")}>
+          {t(`tabs.${tab}` as UIKey)}
+          <span class="n">{count(tab)}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  {
+    feed.map((p) => {
+      if (p.type === "flagship")
+        return (
+          <Post lang={lang} id={p.id} tabs={p.tabs} when={flagship.at} context={{ icon: "pin", label: t("post.pinned"), accent: true }}>
+            <p class="lead display">
+              <span class="acc">{flagship.name}</span>: {flagship.tagline[lang]}
+            </p>
+            <p class="text">{flagship.body[lang]}</p>
+
+            <div class="card flow-card">
+              <div class="card-head">
+                <span class="live"><span class="pulse" aria-hidden="true" />{flagship.status[lang]}</span>
+                <span class="card-kicker">{loc(flagship.eyebrow)}</span>
+              </div>
+              <ol class="flow">
+                {flagship.flow[lang].map((step, i) => (
+                  <li class:list={{ mid: i > 0 && i < flagship.flow[lang].length - 1 }}>{step}</li>
+                ))}
+              </ol>
+              <dl class="facts">
+                {flagship.facts.map((f) => (
+                  <div>
+                    <dt>{f.k[lang]}</dt>
+                    {f.n && <dd class="big display">{f.n[lang]}</dd>}
+                    <dd>{f.v[lang]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <ul class="chips stack">
+              {flagship.stack.map((s) => <li class="chip">{s}</li>)}
+            </ul>
+          </Post>
+        );
+
+      if (p.type === "thread")
+        return (
+          <Post lang={lang} id={p.id} tabs={p.tabs} when={t("post.thread")} context={{ icon: "message", label: `${chatScript[lang].length} ${lang === "pt" ? "respostas" : "replies"}` }}>
+            <p class="text">{t("thread.intro")}</p>
+            <ol class="thread">
+              {chatScript[lang].map((turn) => (
+                <li>
+                  <div class="q">
+                    <span class="anon" aria-hidden="true">?</span>
+                    <p>
+                      <span class="who">{t("thread.visitor")}</span>
+                      {turn.q}
+                    </p>
+                  </div>
+                  <div class="a">
+                    <img src="/img/christian.webp" alt="" width="28" height="28" loading="lazy" />
+                    <p>{turn.a}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </Post>
+        );
+
+      if (p.type === "job")
+        return (
+          <Post lang={lang} id={p.id} tabs={p.tabs} when={formatDate(p.job.start, lang)} context={{ icon: "briefcase", label: t("tabs.career") }}>
+            <p class="lead">{p.job.headline[lang]}</p>
+            <ul class="bullets">
+              {p.job.bullets[lang].map((b) => <li>{b}</li>)}
+            </ul>
+            <div class="card role-card">
+              <span class="logo display" aria-hidden="true">{p.job.company[0]}</span>
+              <div>
+                <p class="role">{p.job.role[lang]}</p>
+                <p class="sub">{p.job.company} · {p.job.period[lang]}</p>
+              </div>
+            </div>
+          </Post>
+        );
+
+      if (p.type === "project") {
+        const pr = p.project;
+        return (
+          <Post
+            lang={lang}
+            id={p.id}
+            tabs={p.tabs}
+            when={pr.year}
+            context={{ icon: "arrow", label: pr.status ? t("post.projectWip") : t("post.project"), accent: !!pr.status }}
+          >
+            <p class="lead">{pr.title[lang]}</p>
+            <p class="text">{pr.summary[lang]}</p>
+            {pr.shots?.length ? (
+              <a
+                class:list={["thumb", { phones: pr.shots[0].device === "phone" }]}
+                href={`${projectsPath(lang)}#${pr.slug}`}
+                aria-label={`${t("projects.title")}: ${pr.title[lang]}`}
+              >
+                {(pr.shots[0].device === "phone" ? pr.shots : pr.shots.slice(0, 1)).map((s) => (
+                  <img src={s.src} alt={s.alt[lang]} width={s.width} height={s.height} loading="lazy" decoding="async" />
+                ))}
+              </a>
+            ) : null}
+            <div class="card project-card">
+              <div class="card-head">
+                <span class="card-kicker">{pr.kicker[lang]}</span>
+                {pr.status && <span class="badge">{pr.status[lang]}</span>}
+              </div>
+              <p class="role-line">
+                <strong>{t("post.role")}.</strong> {pr.contribution[lang]}
+              </p>
+              <ul class="chips">
+                {pr.stack.map((s) => <li class="chip">{s}</li>)}
+              </ul>
+              {pr.links?.length ? (
+                <p class="links">
+                  {pr.links.map((l) => (
+                    <a href={l.url} target="_blank" rel="noopener">{l.label} →</a>
+                  ))}
+                </p>
+              ) : (
+                <p class="private">
+                  <Icon name="lock" />
+                  {t("post.private")}
+                </p>
+              )}
+            </div>
+          </Post>
+        );
+      }
+
+      // credential
+      const lead = p.degree ? t("post.degree") : p.items.length > 1 ? `${p.items.length} ${t("post.certs")}` : t("post.cert");
+      return (
+        <Post lang={lang} id={p.id} tabs={p.tabs} when={p.date!} context={{ icon: p.degree ? "school" : "award", label: t("tabs.study") }}>
+          <p class="lead">
+            {lead} · {p.issuer}
+          </p>
+          <ul class="creds">
+            {p.items.map((c) => (
+              <li class="card cred">
+                <Icon name={p.degree ? "school" : "award"} />
+                <div>
+                  <p class="role">{loc(c.title)}</p>
+                  <p class="sub">
+                    {c.issuer} · {c.year}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Post>
+      );
+    })
+  }
+
+  <p class="end">
+    <span class="end-dot" aria-hidden="true"></span>
+    {t("feed.end")}
+  </p>
+</section>
+
+<style>
+  .feed {
+    position: relative;
+  }
+  #timeline {
+    scroll-margin-top: var(--stick, 0px);
+  }
+
+  /* ---------- tabs ---------- */
+  .tabs {
+    position: sticky;
+    top: var(--stick, 0px);
+    z-index: 10;
+    display: flex;
+    background: color-mix(in srgb, var(--card) 86%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs[hidden] {
+    display: none;
+  }
+  .tabs button {
+    flex: 1;
+    position: relative;
+    padding: 0.95rem 0.75rem;
+    font-size: 0.93rem;
+    font-weight: 600;
+    color: var(--ink-3);
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tabs button:hover {
+    background: var(--card-hover);
+    color: var(--ink-2);
+  }
+  .tabs button[aria-pressed="true"] {
+    color: var(--ink);
+    font-weight: 800;
+  }
+  .tabs button[aria-pressed="true"]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 3.25rem;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--accent);
+    transform: translateX(-50%);
+  }
+  .n {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    margin-left: 0.25rem;
+    vertical-align: 1px;
+  }
+
+  /* ---------- post content ---------- */
+  .lead {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 0.3rem;
+    text-wrap: pretty;
+  }
+  .lead.display {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .acc {
+    color: var(--accent-text);
+  }
+  .text {
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .bullets li {
+    position: relative;
+    padding-left: 1.1rem;
+  }
+  .bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0.15rem;
+    top: 0.62em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* attachment card */
+  .card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .flow-card,
+  .project-card {
+    margin-top: 0.8rem;
+    padding: 0.9rem 1rem 1rem;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+  }
+  .card-kicker {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    background: var(--accent-soft);
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ok);
+  }
+  .pulse {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent);
+  }
+  @keyframes pulse {
+    to {
+      box-shadow: 0 0 0 7px transparent;
+    }
+  }
+
+  /* message -> LangGraph -> tools -> GPT -> reply */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .flow li {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: var(--sunk);
+    color: var(--ink-2);
+  }
+  .flow li.mid {
+    background: var(--ink);
+    color: var(--card);
+  }
+  .flow li + li::before {
+    content: "";
+    width: 1.1rem;
+    height: 2px;
+    margin: 0 0.4rem 0 -1.55rem;
+    background: var(--line-strong);
+  }
+  .flow li + li {
+    margin-left: 1.5rem;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.95rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed var(--line);
+  }
+  .facts dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .facts dd {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    margin-top: 0.15rem;
+  }
+  .facts .big {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--accent-text);
+    margin-top: 0.3rem;
+  }
+  .stack {
+    margin-top: 0.7rem;
+  }
+
+  /* Q&A thread */
+  .thread {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .thread li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .q,
+  .a {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: 0.6rem;
+    align-items: start;
+  }
+  .anon,
+  .a img {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+  }
+  .anon {
+    display: grid;
+    place-items: center;
+    background: var(--sunk);
+    color: var(--ink-3);
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+  .a img {
+    object-fit: cover;
+  }
+  .q p,
+  .a p {
+    padding: 0.45rem 0.8rem;
+    border-radius: 4px 16px 16px 16px;
+    font-size: 0.93rem;
+    line-height: 1.45;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .q p {
+    background: var(--sunk);
+  }
+  .q .who {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-3);
+  }
+  .a p {
+    background: var(--accent-soft);
+  }
+  .a {
+    margin-left: 1.25rem;
+  }
+
+  /* job */
+  .role-card,
+  .cred {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.75rem 0.9rem;
+  }
+  .role-card {
+    margin-top: 0.8rem;
+  }
+  .logo {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 12px;
+    background: var(--ink);
+    color: var(--card);
+    font-weight: 800;
+    font-size: 1.2rem;
+    flex: none;
+  }
+  .role {
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .sub {
+    font-size: 0.85rem;
+    color: var(--ink-3);
+  }
+
+  /* project */
+  .role-line {
+    font-size: 0.93rem;
+    color: var(--ink-2);
+    margin-bottom: 0.7rem;
+  }
+  .role-line strong {
+    color: var(--ink);
+  }
+  /* project cover, links to the projects page */
+  .thumb {
+    display: grid;
+    margin-top: 0.8rem;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    background: var(--sunk);
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    transition: transform 0.4s var(--ease);
+  }
+  .thumb:hover img {
+    transform: scale(1.02);
+  }
+  .thumb.phones {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem 0;
+  }
+  .thumb.phones img {
+    object-position: top center;
+    border-radius: 14px 14px 0 0;
+    border: 4px solid var(--ink);
+    border-bottom: 0;
+  }
+
+  .private,
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+  .private :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+  .links a {
+    color: var(--accent-text);
+    font-weight: 700;
+  }
+
+  /* credentials */
+  .creds {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.6rem;
+  }
+  .cred :global(.icon) {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--accent);
+  }
+
+  .end {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2.5rem 1rem 3rem;
+    color: var(--ink-3);
+    font-size: 0.9rem;
+  }
+  .end-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    border: 2px solid var(--line-strong);
+  }
+
+  @media (max-width: 560px) {
+    .facts {
+      grid-template-columns: 1fr;
+      gap: 0.55rem;
+    }
+    .a {
+      margin-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse {
+      animation: none;
+    }
+  }
+</style>

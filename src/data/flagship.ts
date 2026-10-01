@@ -1,53 +1,55 @@
 export interface Fact {
   k: { pt: string; en: string };
+  // optional headline number shown big above the text
+  n?: { pt: string; en: string };
   v: { pt: string; en: string };
 }
 
-// The flagship case: MarIA, the AI sales agent built at Pedbot.
-// Gets its own section right after the hero.
+// The flagship case: Maria, the AI sales agent built at Pedbot.
+// Pinned at the top of the feed.
 export const flagship = {
-  name: "MarIA",
-  // trailing slice rendered in the accent color ("Mar" + "IA")
-  nameAccent: "IA",
+  name: "Maria",
   at: "Pedbot",
-  eyebrow: { pt: "case principal", en: "flagship case" },
-  status: { pt: "em produção", en: "in production" },
+  eyebrow: { pt: "projeto em destaque", en: "featured project" },
+  status: { pt: "rodou em produção", en: "ran in production" },
   tagline: {
-    pt: "O maior agente de vendas com IA do varejo farmacêutico do Brasil.",
-    en: "The largest AI sales agent in Brazil's pharmaceutical retail.",
+    pt: "Agente de vendas com IA que operou nos maiores players do varejo farmacêutico.",
+    en: "AI sales agent that ran at the largest players in pharmaceutical retail.",
   },
   body: {
-    pt: "Agente de automação de vendas usado ativamente por algumas das maiores redes de farmácia do país. Participei da jornada inteira: arquitetura do agente, orquestração de fluxos com LangGraph, definição das tools internas e integração com modelos GPT. O back-end em NestJS sustenta o agente em larga escala, com mensageria via RabbitMQ. A evolução é contínua: analiso conversas reais, encontro pontos de fricção, ajusto prompts e refino o fluxo conversacional.",
-    en: "A sales-automation agent actively used by some of the largest pharmacy chains in the country. I took part in the entire journey: agent architecture, flow orchestration with LangGraph, internal tool definitions and GPT model integration. The NestJS back-end runs the agent at scale, with RabbitMQ messaging. Evolution is continuous: I analyze real conversations, find friction points, tune prompts and refine the conversational flow.",
+    pt: "Projeto desenvolvido durante a minha atuação na Pedbot. Participei de ponta a ponta: da modelagem dos fluxos com LangGraph, modelos GPT, tool calling e guardrails, à construção dos microsserviços em NestJS e RabbitMQ com controles de concorrência em Redis para processamento distribuído. Prompts e lógica de fluxo eram refinados continuamente a partir da análise de conversas reais.",
+    en: "Built while I was at Pedbot. I worked on it end to end: from designing the flows with LangGraph, GPT models, tool calling and guardrails, to building the NestJS and RabbitMQ microservices with Redis concurrency controls for distributed processing. Prompts and flow logic were continuously refined based on the analysis of real conversations.",
   },
   flow: {
-    pt: ["mensagem", "LangGraph", "tools", "GPT", "resposta"],
-    en: ["message", "LangGraph", "tools", "GPT", "reply"],
+    pt: ["mensagem", "LangGraph", "tools · ERP", "GPT", "guardrails", "resposta"],
+    en: ["message", "LangGraph", "tools · ERP", "GPT", "guardrails", "reply"],
   },
   facts: [
     {
-      k: { pt: "Escala", en: "Scale" },
+      k: { pt: "Volume", en: "Volume" },
+      n: { pt: "1.000+", en: "1,000+" },
       v: {
-        pt: "Grandes redes de farmácia, rodando em produção",
-        en: "Major pharmacy chains, running in production",
+        pt: "atendimentos por dia",
+        en: "conversations per day",
+      },
+    },
+    {
+      k: { pt: "Conversão", en: "Conversion" },
+      n: { pt: "10%+", en: "10%+" },
+      v: {
+        pt: "de conversão em pedidos pagos",
+        en: "conversion into paid orders",
       },
     },
     {
       k: { pt: "Meu papel", en: "My role" },
       v: {
-        pt: "Arquitetura do agente, back-end e evolução contínua",
-        en: "Agent architecture, back-end and continuous evolution",
-      },
-    },
-    {
-      k: { pt: "Resultado", en: "Outcome" },
-      v: {
-        pt: "Menos atendimento humano, mais conversão em vendas",
-        en: "Less human support, higher sales conversion",
+        pt: "Fluxos do agente, tool calling, guardrails e microsserviços",
+        en: "Agent flows, tool calling, guardrails and microservices",
       },
     },
   ] as Fact[],
-  stack: ["LangGraph", "NestJS", "GPT", "RabbitMQ", "TypeScript"],
+  stack: ["LangGraph", "GPT", "NestJS", "RabbitMQ", "Redis", "TypeScript"],
 } as const;
 
 export type Flagship = typeof flagship;
