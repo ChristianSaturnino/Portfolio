@@ -15,6 +15,11 @@ const handle = site.socials.github.split("/").pop();
 
 <header class="profile">
   <div class="banner" aria-hidden="true">
+    <span class="planet"></span>
+    <div class="sign">
+      <span class="sign-mark"></span>
+      <span class="sign-name">{site.name}</span>
+    </div>
     <p class="display">{site.tagline[lang]}</p>
   </div>
 
@@ -57,29 +62,78 @@ const handle = site.socials.github.split("/").pop();
 
   .banner {
     position: relative;
-    height: 12.5rem;
-    background: var(--accent);
+    height: 15.5rem;
+    background:
+      radial-gradient(120% 140% at 88% 10%, color-mix(in srgb, var(--accent) 78%, #fff) 0%, transparent 55%),
+      var(--accent);
     color: var(--on-accent);
     display: flex;
     align-items: flex-end;
-    padding: 1.25rem 1.5rem 1.4rem 10.5rem;
+    padding: 1.25rem 1.5rem 1.5rem 10.5rem;
     overflow: hidden;
+    isolation: isolate;
   }
   /* faint dot grid so the block of color has some texture */
   .banner::before {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: -1;
     background-image: radial-gradient(color-mix(in srgb, var(--on-accent) 22%, transparent) 1px, transparent 1.2px);
     background-size: 14px 14px;
     mask-image: linear-gradient(to left, #000, transparent 75%);
   }
+  /* the logo mark, oversized and bleeding off the right edge */
+  .planet {
+    position: absolute;
+    z-index: -1;
+    right: -7rem;
+    top: -1.5rem;
+    width: 33rem;
+    aspect-ratio: 723 / 359;
+    background: var(--on-accent);
+    opacity: 0.16;
+    -webkit-mask: url("/img/logo-mark.png") center / contain no-repeat;
+    mask: url("/img/logo-mark.png") center / contain no-repeat;
+    transform: rotate(-8deg);
+    animation: float 16s ease-in-out infinite alternate;
+  }
+  @keyframes float {
+    to {
+      transform: rotate(-3deg) translate(-1rem, 0.6rem) scale(1.04);
+    }
+  }
+  /* small signature in the corner, set like the logo's wordmark */
+  .sign {
+    position: absolute;
+    top: 1.1rem;
+    left: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .sign-mark {
+    width: 2.6rem;
+    aspect-ratio: 723 / 359;
+    background: var(--on-accent);
+    -webkit-mask: url("/img/logo-mark.png") center / contain no-repeat;
+    mask: url("/img/logo-mark.png") center / contain no-repeat;
+  }
+  .sign-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
   .banner p {
     position: relative;
-    font-size: clamp(1.35rem, 3.2vw, 1.75rem);
-    font-weight: 700;
-    line-height: 1.08;
+    font-size: clamp(1.5rem, 3.6vw, 2.15rem);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
     text-wrap: balance;
+    max-width: 27rem;
   }
 
   .top {
@@ -160,8 +214,18 @@ const handle = site.socials.github.split("/").pop();
   @media (max-width: 560px) {
     .banner {
       height: auto;
-      min-height: 9rem;
-      padding: 1.1rem 1rem 3.5rem;
+      min-height: 11.5rem;
+      padding: 3.6rem 1rem 3.6rem;
+      align-items: flex-start;
+    }
+    .sign {
+      left: 1rem;
+      top: 1rem;
+    }
+    .planet {
+      width: 22rem;
+      right: -6rem;
+      top: 1rem;
     }
     .top {
       padding: 0 1rem;
@@ -176,7 +240,8 @@ const handle = site.socials.github.split("/").pop();
       padding: 0 0.9rem;
       font-size: 0.85rem;
     }
-    .actions .btn-ghost :global(.icon) {
+    /* the top bar already carries the résumé button on phones */
+    .actions .btn-ghost {
       display: none;
     }
     .who,
@@ -185,6 +250,12 @@ const handle = site.socials.github.split("/").pop();
     .stats {
       padding-left: 1rem;
       padding-right: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .planet {
+      animation: none;
     }
   }
 </style>

@@ -63,11 +63,6 @@ const loc = (v: string | { pt: string; en: string }) => (typeof v === "string" ?
       </div>
       <a class="more" href={contactPath(lang)}>{t("contact.seeAll")} <Icon name="arrow" /></a>
     </section>
-
-    <p class="foot">
-      <a href={site.socials.github} target="_blank" rel="noopener">{t("footer.built")}</a>
-      <span>© {new Date().getFullYear()} {site.name}</span>
-    </p>
   </div>
 </aside>
 
@@ -170,16 +165,10 @@ const loc = (v: string | { pt: string; en: string }) => (typeof v === "string" ?
     padding: 0 0.7rem;
   }
 
-  .foot {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.8rem;
-    font-size: 0.78rem;
-    color: var(--ink-3);
-    padding: 0 0.25rem;
-  }
-  .foot a:hover {
-    text-decoration: underline;
+  @media (max-width: 700px) {
+    .contact {
+      display: none;
+    }
   }
 
   /* below the 3-column breakpoint the rail flows under the feed */

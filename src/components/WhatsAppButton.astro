@@ -1,0 +1,139 @@
+---
+import Icon from "./Icon.astro";
+import type { Lang } from "../data/site";
+import { useTranslations, whatsappLink } from "../i18n/ui";
+
+// Floating shortcut to WhatsApp with a pre-filled message. Steps aside when the
+// footer is on screen so it never sits on top of the footer's own links.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<a class="wa" href={whatsappLink(lang)} target="_blank" rel="noopener" aria-label={t("wa.label")} data-wa>
+  <span class="wa-text">{t("wa.label")}</span>
+  <span class="wa-icon"><Icon name="whatsapp" /></span>
+</a>
+
+<script>
+  const btn = document.querySelector<HTMLElement>("[data-wa]");
+  const foot = document.querySelector("footer");
+  if (btn && foot && "IntersectionObserver" in window) {
+    new IntersectionObserver(([e]) => btn.toggleAttribute("data-away", e.isIntersecting), { rootMargin: "0px 0px -15% 0px" }).observe(foot);
+  }
+</script>
+
+<style>
+  .wa {
+    --wa: #1faa55;
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    height: 3.5rem;
+    border-radius: 999px;
+    background: var(--wa);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.93rem;
+    box-shadow:
+      0 2px 6px rgb(0 0 0 / 0.18),
+      0 12px 28px -8px rgb(0 0 0 / 0.35);
+    transition: transform 0.25s var(--ease), opacity 0.25s ease, background 0.15s ease;
+  }
+  .wa:hover {
+    background: color-mix(in srgb, var(--wa) 88%, #000);
+    transform: translateY(-2px);
+  }
+  .wa[data-away] {
+    opacity: 0;
+    transform: translateY(1rem);
+    pointer-events: none;
+  }
+
+  .wa-icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    flex: none;
+  }
+  .wa-icon :global(.icon) {
+    width: 1.75rem;
+    height: 1.75rem;
+    stroke-width: 2;
+  }
+
+  /* the label slides open on hover/focus; closed it takes no room */
+  .wa-text {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: max-width 0.35s var(--ease), opacity 0.2s ease, padding 0.35s var(--ease);
+  }
+  .wa:hover .wa-text,
+  .wa:focus-visible .wa-text {
+    max-width: 16rem;
+    opacity: 1;
+    padding-left: 1.25rem;
+  }
+
+  /* soft ring that pulses a few times to draw the eye, then rests */
+  .wa::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--wa) 55%, transparent);
+    animation: ring 2.4s ease-out 1.5s 3;
+    pointer-events: none;
+  }
+  @keyframes ring {
+    to {
+      box-shadow: 0 0 0 1rem transparent;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .wa {
+      right: 0.85rem;
+      bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 0.85rem);
+      height: 3rem;
+    }
+    .wa-icon,
+    .wa::after {
+      width: 3rem;
+      height: 3rem;
+    }
+    .wa-icon :global(.icon) {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    .wa-text {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wa::after {
+      animation: none;
+    }
+    .wa,
+    .wa-text {
+      transition: none;
+    }
+  }
+
+  @media print {
+    .wa {
+      display: none;
+    }
+  }
+</style>

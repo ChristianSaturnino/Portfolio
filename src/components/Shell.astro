@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Sidebar from "./Sidebar.astro";
 import Icon from "./Icon.astro";
+import Footer from "./Footer.astro";
 import type { Lang } from "../data/site";
 import type { Page } from "../i18n/ui";
 import { useTranslations, homePath } from "../i18n/ui";
@@ -38,6 +39,7 @@ const t = useTranslations(lang);
       <slot />
     </main>
   </div>
+  <Footer lang={lang} page={page} />
 </Base>
 
 <style>
@@ -106,12 +108,14 @@ const t = useTranslations(lang);
     .app {
       grid-template-columns: minmax(0, 1fr);
       padding: 0;
-      --stick: 3.1rem;
+      --stick: var(--bar-h);
     }
     .column {
       border: 0;
     }
+    /* the tab bar already handles navigation here, so this bar just scrolls away */
     .topbar {
+      position: static;
       padding: 0.4rem 1rem;
     }
   }

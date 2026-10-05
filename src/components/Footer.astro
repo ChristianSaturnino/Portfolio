@@ -1,0 +1,265 @@
+---
+import Icon, { type IconName } from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { useTranslations, whatsappLink, homePath, projectsPath, stackPath, contactPath, pagePath, type Page } from "../i18n/ui";
+
+// Site-wide footer: a closing call to action, the same links as the sidebar
+// grouped in columns, and the name set large with the logo mark.
+interface Props {
+  lang: Lang;
+  page?: Page;
+}
+const { lang, page = "home" } = Astro.props;
+const t = useTranslations(lang);
+const other: Lang = lang === "pt" ? "en" : "pt";
+const wa = whatsappLink(lang);
+
+const cols: { title: string; links: { label: string; href: string; icon?: IconName; external?: boolean }[] }[] = [
+  {
+    title: t("footer.browse"),
+    links: [
+      { label: t("nav.feed"), href: homePath(lang) },
+      { label: t("nav.projects"), href: projectsPath(lang) },
+      { label: t("nav.stack"), href: stackPath(lang) },
+      { label: t("nav.contact"), href: contactPath(lang) },
+    ],
+  },
+  {
+    title: t("nav.contact"),
+    links: [
+      { label: t("contact.email"), href: `mailto:${site.email}`, icon: "mail" },
+      { label: "WhatsApp", href: wa, icon: "whatsapp", external: true },
+      { label: "LinkedIn", href: site.socials.linkedin, icon: "linkedin", external: true },
+      { label: "GitHub", href: site.socials.github, icon: "github", external: true },
+    ],
+  },
+  {
+    title: t("contact.resumes"),
+    links: [
+      { label: "Português (PDF)", href: site.cv.pt, icon: "download", external: true },
+      { label: "English (PDF)", href: site.cv.en, icon: "download", external: true },
+      { label: t("contact.saveContact"), href: "/christian-saturnino.vcf", icon: "userPlus" },
+    ],
+  },
+];
+---
+
+<footer class="foot">
+  <div class="inner">
+    <div class="top">
+      <div class="cta">
+        <p class="hello display">{t("contact.hello")}</p>
+        <p class="sub">{t("rail.contactBody")}</p>
+        <a class="btn btn-accent" href={`mailto:${site.email}`}>
+          <Icon name="mail" />
+          {t("cta.message")}
+        </a>
+      </div>
+
+      <nav class="cols" aria-label={t("footer.browse")}>
+        {
+          cols.map((c) => (
+            <div>
+              <p class="col-title">{c.title}</p>
+              <ul>
+                {c.links.map((l) => (
+                  <li>
+                    <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener" } : {})}>
+                      {l.icon && <Icon name={l.icon} />}
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="brand" aria-hidden="true">
+      <span class="mark"></span>
+      <p class="name display">{site.name}</p>
+    </div>
+
+    <div class="bottom">
+      <p>© {new Date().getFullYear()} {site.name} · {site.location[lang]}</p>
+      <p class="built">{t("footer.built")}</p>
+      <div class="tools">
+        <a class="pill" href={pagePath(other, page)} hreflang={other} aria-label={t("lang.switchLabel")}>
+          <Icon name="globe" />
+          <span class:list={{ on: lang === "pt" }}>PT</span>
+          <span class:list={{ on: lang === "en" }}>EN</span>
+        </a>
+        <a class="pill" href="#feed">
+          {t("footer.top")}
+          <Icon name="arrow" class="up" />
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* one step above the page background, with a hairline on top */
+  .foot {
+    --f-bg: #1a1916;
+    border-top: 1px solid var(--line);
+    --f-fg: #f6f1e7;
+    background: var(--f-bg);
+    color: var(--f-fg);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .inner {
+    max-width: calc(var(--col-side) + var(--col-feed) + var(--col-rail));
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 1.5rem;
+  }
+
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    gap: 3rem;
+    align-items: start;
+  }
+  .hello {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+  .sub {
+    margin: 0.9rem 0 1.25rem;
+    max-width: 24rem;
+    color: color-mix(in srgb, var(--f-fg) 70%, transparent);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .col-title {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--f-fg) 55%, transparent);
+    margin-bottom: 0.8rem;
+  }
+  .cols ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .cols a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    transition: color 0.15s ease, transform 0.2s var(--ease);
+  }
+  .cols a:hover {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+  .cols :global(.icon) {
+    width: 1.05rem;
+    height: 1.05rem;
+    opacity: 0.7;
+  }
+
+  /* name set huge, with the logo mark; bleeds a little past the bottom rule */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.75rem);
+    margin-top: 3.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--f-fg) 18%, transparent);
+  }
+  .mark {
+    flex: none;
+    width: clamp(3rem, 11vw, 9.5rem);
+    aspect-ratio: 723 / 359;
+    background: var(--accent);
+    -webkit-mask: url("/img/logo-mark.png") center / contain no-repeat;
+    mask: url("/img/logo-mark.png") center / contain no-repeat;
+  }
+  .name {
+    font-size: clamp(1.5rem, 7.1vw, 6.1rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+  }
+
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    padding-top: 1.1rem;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--f-fg) 60%, transparent);
+  }
+  .tools {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--f-fg) 25%, transparent);
+    font-weight: 700;
+    color: color-mix(in srgb, var(--f-fg) 60%, transparent);
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .pill:hover {
+    border-color: var(--f-fg);
+    color: var(--f-fg);
+  }
+  .pill .on {
+    color: var(--f-fg);
+  }
+  .pill :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+  .pill :global(.up) {
+    transform: rotate(-90deg);
+  }
+
+  @media (max-width: 860px) {
+    .top {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .inner {
+      padding: 2.5rem 1rem 1.25rem;
+    }
+    .cols {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem 1rem;
+    }
+    .brand {
+      margin-top: 2.5rem;
+    }
+    .tools {
+      margin-left: 0;
+      width: 100%;
+    }
+    .built {
+      display: none;
+    }
+  }
+</style>

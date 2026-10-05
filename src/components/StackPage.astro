@@ -99,8 +99,10 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+
                       {x.core && <span class="tag">{t("stack.core").toLowerCase()}</span>}
                     </div>
                     {x.usedIn.length > 0 && (
-                      <div class="used">
-                        <p class="used-label">{t("stack.usedIn")}</p>
+                      <details class="used" open>
+                        <summary class="used-label">
+                          {t("stack.usedIn")} <span class="used-n">{x.usedIn.length} {t("stack.posts")}</span>
+                        </summary>
                         <ul>
                           {x.usedIn.map((u) => (
                             <li>
@@ -110,7 +112,7 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+
                             </li>
                           ))}
                         </ul>
-                      </div>
+                      </details>
                     )}
                   </li>
                 ))}
@@ -131,6 +133,13 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+
         </a>
       </footer>
 </Shell>
+
+<script>
+  // on phones the per-tech post lists start folded (they stay open without JS)
+  if (window.matchMedia("(max-width: 560px)").matches) {
+    document.querySelectorAll("details.used").forEach((d) => d.removeAttribute("open"));
+  }
+</script>
 
 <style>
   /* ---------- hero ---------- */
@@ -396,6 +405,17 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+
     color: var(--ink-3);
     margin-bottom: 0.35rem;
   }
+  /* desktop: always open, the summary is just a label */
+  .used summary {
+    list-style: none;
+    pointer-events: none;
+  }
+  .used summary::-webkit-details-marker {
+    display: none;
+  }
+  .used-n {
+    display: none;
+  }
   .used ul {
     display: flex;
     flex-direction: column;
@@ -435,6 +455,59 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+
   @media (max-width: 860px) {
     .core {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* phones: two tiles per row, post lists folded behind a tap */
+  @media (max-width: 560px) {
+    .tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+    .tile {
+      padding: 0.75rem 0.8rem 0.8rem;
+      gap: 0.5rem;
+    }
+    .tile:has(details[open]) {
+      grid-column: 1 / -1;
+    }
+    .tile-top {
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .tile-name {
+      font-size: 1.08rem;
+    }
+    .used summary {
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      margin: 0;
+      letter-spacing: 0;
+      text-transform: none;
+      font-size: 0.78rem;
+      color: var(--accent-text);
+    }
+    .used summary::after {
+      content: "+";
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .used[open] summary::after {
+      content: "−";
+    }
+    .used-n {
+      display: inline;
+    }
+    .used[open] ul {
+      margin-top: 0.4rem;
+    }
+    .used a {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
     }
   }
 

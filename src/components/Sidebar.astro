@@ -47,11 +47,9 @@ const links: { href: string; label: string; icon: IconName; external?: boolean; 
       </ul>
     </nav>
 
-    <a class:list={["bar-link", "bar-first", { on: page === "projects" }]} href={projectsPath(lang)} aria-label={t("nav.projects")}>
-      <Icon name="apps" />
-    </a>
-    <a class:list={["bar-link", { on: page === "stack" }]} href={stackPath(lang)} aria-label={t("nav.stack")}>
-      <Icon name="stack" />
+    <a class="bar-cv" href={site.cv[lang]} target="_blank" rel="noopener">
+      <Icon name="file" />
+      {t("nav.resume")}
     </a>
 
     <a class="btn btn-accent cta" href={`mailto:${site.email}`}>
@@ -66,6 +64,20 @@ const links: { href: string; label: string; icon: IconName; external?: boolean; 
     </a>
   </div>
 </aside>
+
+<!-- phone only: app-style tab bar pinned to the bottom -->
+<div class="tabbar" role="navigation" aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}>
+  {
+    links
+      .filter((l) => !l.external)
+      .map((l) => (
+        <a href={l.href} aria-current={l.active ? "page" : undefined}>
+          <Icon name={l.icon} />
+          <span>{l.label}</span>
+        </a>
+      ))
+  }
+</div>
 
 <style>
   .side {
@@ -127,13 +139,10 @@ const links: { href: string; label: string; icon: IconName; external?: boolean; 
     color: var(--accent);
   }
 
-  /* projects/stack shortcuts, only shown in the phone top bar */
-  .bar-link {
+  /* résumé shortcut and tab bar, only shown on phones */
+  .bar-cv,
+  .tabbar {
     display: none;
-  }
-  nav :global(.icon) {
-    width: 1.35rem;
-    height: 1.35rem;
   }
 
   .cta {
@@ -195,7 +204,7 @@ const links: { href: string; label: string; icon: IconName; external?: boolean; 
     }
   }
 
-  /* phone: slim sticky top bar */
+  /* phone: slim sticky top bar + bottom tab bar */
   @media (max-width: 700px) {
     .side {
       position: sticky;
@@ -209,10 +218,11 @@ const links: { href: string; label: string; icon: IconName; external?: boolean; 
     .side-inner {
       position: static;
       min-height: 0;
+      height: var(--bar-h);
       flex-direction: row;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 1rem;
+      padding: 0 1rem;
     }
     .brand span {
       display: inline;
@@ -222,32 +232,79 @@ const links: { href: string; label: string; icon: IconName; external?: boolean; 
       width: 2rem;
       height: 2rem;
     }
-    nav {
+    nav,
+    .cta {
       display: none;
     }
-    .bar-link {
-      display: grid;
-      place-items: center;
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-    }
-    .bar-first {
+    .bar-cv {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       margin-left: auto;
+      height: 2.25rem;
+      padding: 0 0.8rem 0 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      font-size: 0.85rem;
+      font-weight: 700;
     }
-    .bar-link.on {
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-    .cta {
-      width: 2.5rem;
-      height: 2.5rem;
+    .bar-cv :global(.icon) {
+      width: 1rem;
+      height: 1rem;
     }
     .lang {
       margin: 0;
       flex-direction: row;
-      padding: 0.45rem 0.7rem;
+      height: 2.25rem;
+      padding: 0 0.7rem;
+    }
+
+    .tabbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--line);
+    }
+    .tabbar a {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--ink-3);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tabbar :global(.icon) {
+      width: 1.45rem;
+      height: 1.45rem;
+    }
+    .tabbar a[aria-current="page"] {
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .tabbar a[aria-current="page"] :global(.icon) {
+      color: var(--accent);
+    }
+    .tabbar a[aria-current="page"]::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 2rem;
+      height: 3px;
+      border-radius: 0 0 3px 3px;
+      background: var(--accent);
     }
   }
 </style>

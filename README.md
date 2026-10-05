@@ -36,7 +36,7 @@ src/
   data/            conteúdo (fonte da verdade)
   i18n/ui.ts       strings de interface + helper de tradução
   layouts/Base.astro   <head>, fontes, SEO/OG, tema
-  components/      Page, Shell, ProjectsPage, StackPage, ContactPage, Sidebar, Profile, Feed, Post, Rail, Icon
+  components/      Page, Shell, ProjectsPage, StackPage, ContactPage, Footer, Sidebar, Profile, Feed, Post, Rail, Icon
   pages/
     index.astro    rota PT  (/)
     en/index.astro rota EN  (/en)
@@ -50,12 +50,12 @@ src/
   styles/global.css  design system (tokens em :root)
 public/
   cv/              PDFs do currículo
-  favicon.svg
+  favicon-32.png, favicon-192.png, apple-touch-icon.png
 ```
 
 ## Design
 
-Layout de feed (estilo timeline social): sidebar, perfil + timeline filtrável, coluna com stack e contato. Cada marco (cargo, projeto, certificação) é um post; a Maria fica fixada no topo. Claro por padrão, escuro via `prefers-color-scheme`. Tokens no `:root` de `src/styles/global.css`; trocar `--accent` muda a cor de destaque do site inteiro.
+Layout de feed (estilo timeline social): sidebar, perfil + timeline filtrável, coluna com stack e contato. Cada marco (cargo, projeto, certificação) é um post; a Maria fica fixada no topo. Tema escuro único (não há modo claro). Tokens no `:root` de `src/styles/global.css`; trocar `--accent` muda a cor de destaque do site inteiro.
 
 ## Deploy
 

@@ -1,7 +1,7 @@
 ---
 import Post from "./Post.astro";
 import Icon from "./Icon.astro";
-import { feed, formatDate, type Tab } from "../data/feed";
+import { feed, groups, formatDate, type Tab } from "../data/feed";
 import { flagship } from "../data/flagship";
 import { chatScript } from "../data/chat";
 import type { Lang } from "../data/site";
@@ -32,7 +32,14 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
   </div>
 
   {
-    feed.map((p) => {
+    groups.map((g) => (
+      <section class="group" aria-label={g.year ?? t("post.pinned")}>
+        {g.year && (
+          <h2 class="year">
+            <span class="display">{g.year}</span>
+          </h2>
+        )}
+        {g.posts.map((p) => {
       if (p.type === "flagship")
         return (
           <Post lang={lang} id={p.id} tabs={p.tabs} when={flagship.at} context={{ icon: "pin", label: t("post.pinned"), accent: true }}>
@@ -71,23 +78,37 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
         return (
           <Post lang={lang} id={p.id} tabs={p.tabs} when={t("post.thread")} context={{ icon: "message", label: `${chatScript[lang].length} ${lang === "pt" ? "respostas" : "replies"}` }}>
             <p class="text">{t("thread.intro")}</p>
-            <ol class="thread">
-              {chatScript[lang].map((turn) => (
-                <li>
-                  <div class="q">
-                    <span class="anon" aria-hidden="true">?</span>
-                    <p>
-                      <span class="who">{t("thread.visitor")}</span>
-                      {turn.q}
-                    </p>
-                  </div>
-                  <div class="a">
-                    <img src="/img/christian.webp" alt="" width="28" height="28" loading="lazy" />
-                    <p>{turn.a}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            {[chatScript[lang].slice(0, 1), chatScript[lang].slice(1)].map((turns, part) => {
+              const list = (
+                <ol class="thread">
+                  {turns.map((turn) => (
+                    <li>
+                      <div class="q">
+                        <span class="anon" aria-hidden="true">?</span>
+                        <p>
+                          <span class="who">{t("thread.visitor")}</span>
+                          {turn.q}
+                        </p>
+                      </div>
+                      <div class="a">
+                        <img src="/img/christian.webp" alt="" width="28" height="28" loading="lazy" />
+                        <p>{turn.a}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              );
+              return part === 0 ? (
+                list
+              ) : (
+                <details class="more-replies">
+                  <summary>
+                    {t("thread.more")} ({turns.length})
+                  </summary>
+                  {list}
+                </details>
+              );
+            })}
           </Post>
         );
 
@@ -99,7 +120,11 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
               {p.job.bullets[lang].map((b) => <li>{b}</li>)}
             </ul>
             <div class="card role-card">
-              <span class="logo display" aria-hidden="true">{p.job.company[0]}</span>
+              {p.job.logo ? (
+                <img class="logo-img" src={p.job.logo.src} alt={p.job.company} width={p.job.logo.width} height={p.job.logo.height} loading="lazy" decoding="async" />
+              ) : (
+                <span class="logo display" aria-hidden="true">{p.job.company[0]}</span>
+              )}
               <div>
                 <p class="role">{p.job.role[lang]}</p>
                 <p class="sub">{p.job.company} · {p.job.period[lang]}</p>
@@ -119,7 +144,7 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
             context={{ icon: "arrow", label: pr.status ? t("post.projectWip") : t("post.project"), accent: !!pr.status }}
           >
             <p class="lead">{pr.title[lang]}</p>
-            <p class="text">{pr.summary[lang]}</p>
+            <p class="text clamp">{pr.summary[lang]}</p>
             {pr.shots?.length ? (
               <a
                 class:list={["thumb", { phones: pr.shots[0].device === "phone" }]}
@@ -131,29 +156,12 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
                 ))}
               </a>
             ) : null}
-            <div class="card project-card">
-              <div class="card-head">
-                <span class="card-kicker">{pr.kicker[lang]}</span>
-                {pr.status && <span class="badge">{pr.status[lang]}</span>}
-              </div>
-              <p class="role-line">
-                <strong>{t("post.role")}.</strong> {pr.contribution[lang]}
-              </p>
-              <ul class="chips">
-                {pr.stack.map((s) => <li class="chip">{s}</li>)}
-              </ul>
-              {pr.links?.length ? (
-                <p class="links">
-                  {pr.links.map((l) => (
-                    <a href={l.url} target="_blank" rel="noopener">{l.label} →</a>
-                  ))}
-                </p>
-              ) : (
-                <p class="private">
-                  <Icon name="lock" />
-                  {t("post.private")}
-                </p>
-              )}
+            <div class="pmeta">
+              <span class="card-kicker">{pr.kicker[lang]}</span>
+              {pr.status && <span class="badge">{pr.status[lang]}</span>}
+              <a class="see" href={`${projectsPath(lang)}#${pr.slug}`}>
+                {t("feed.seeProject")} <Icon name="arrow" />
+              </a>
             </div>
           </Post>
         );
@@ -166,9 +174,9 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
           <p class="lead">
             {lead} · {p.issuer}
           </p>
-          <ul class="creds">
+          <ul class="card creds">
             {p.items.map((c) => (
-              <li class="card cred">
+              <li class="cred">
                 <Icon name={p.degree ? "school" : "award"} />
                 <div>
                   <p class="role">{loc(c.title)}</p>
@@ -181,7 +189,9 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
           </ul>
         </Post>
       );
-    })
+        })}
+      </section>
+    ))
   }
 
   <p class="end">
@@ -252,6 +262,31 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
     vertical-align: 1px;
   }
 
+  /* ---------- year groups ---------- */
+  /* a group with every post filtered out disappears, heading included */
+  .group:not(:has(:global(.post:not([hidden])))) {
+    display: none;
+  }
+  .year {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.4rem 1.25rem 0.7rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .year .display {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .year::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--ink);
+  }
+
   /* ---------- post content ---------- */
   .lead {
     font-size: 1.05rem;
@@ -272,6 +307,65 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
   .text {
     color: var(--ink);
     text-wrap: pretty;
+  }
+  .clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  /* project footer row: kicker on the left, link to the full case on the right */
+  .pmeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    margin-top: 0.7rem;
+  }
+  .see {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    white-space: nowrap;
+  }
+  .see :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.15s var(--ease);
+  }
+  .see:hover :global(.icon) {
+    transform: translateX(3px);
+  }
+
+  .more-replies {
+    margin-top: 0.8rem;
+  }
+  .more-replies summary {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    list-style: none;
+  }
+  .more-replies summary::-webkit-details-marker {
+    display: none;
+  }
+  .more-replies[open] summary {
+    display: none;
+  }
+  .more-replies .thread {
+    margin-top: 0;
   }
 
   .bullets {
@@ -300,8 +394,7 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
     border-radius: var(--radius);
     background: var(--card);
   }
-  .flow-card,
-  .project-card {
+  .flow-card {
     margin-top: 0.8rem;
     padding: 0.9rem 1rem 1rem;
   }
@@ -500,6 +593,16 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
     font-size: 1.2rem;
     flex: none;
   }
+  .logo-img {
+    height: 2.75rem;
+    width: auto;
+    max-width: 7.5rem;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+    flex: none;
+  }
   .role {
     font-weight: 700;
     line-height: 1.3;
@@ -509,15 +612,6 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
     color: var(--ink-3);
   }
 
-  /* project */
-  .role-line {
-    font-size: 0.93rem;
-    color: var(--ink-2);
-    margin-bottom: 0.7rem;
-  }
-  .role-line strong {
-    color: var(--ink);
-  }
   /* project cover, links to the projects page */
   .thumb {
     display: grid;
@@ -550,29 +644,13 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
     border-bottom: 0;
   }
 
-  .private,
-  .links {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.8rem;
-    font-size: 0.8rem;
-    color: var(--ink-3);
-  }
-  .private :global(.icon) {
-    width: 0.95rem;
-    height: 0.95rem;
-  }
-  .links a {
-    color: var(--accent-text);
-    font-weight: 700;
-  }
 
   /* credentials */
   .creds {
-    display: grid;
-    gap: 0.45rem;
     margin-top: 0.6rem;
+  }
+  .cred + .cred {
+    border-top: 1px solid var(--line);
   }
   .cred :global(.icon) {
     width: 1.5rem;
@@ -597,6 +675,16 @@ const count = (tab: Tab) => (tab === "all" ? feed.length : feed.filter((p) => p.
   }
 
   @media (max-width: 560px) {
+    .tabs button {
+      padding: 0.85rem 0.25rem;
+      font-size: 0.88rem;
+    }
+    .n {
+      display: none;
+    }
+    .year {
+      padding: 1.1rem 1rem 0.6rem;
+    }
     .facts {
       grid-template-columns: 1fr;
       gap: 0.55rem;

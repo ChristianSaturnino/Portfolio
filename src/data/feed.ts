@@ -60,9 +60,27 @@ const dated: Post[] = [
   ...projects.map((p): Post => ({ type: "project", id: p.slug, tabs: ["projects"], date: p.year, project: p })),
   ...experience.map((j): Post => ({ type: "job", id: `${j.company}-${j.start}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"), tabs: ["career"], date: j.start, job: j })),
   ...credentialPosts(),
-].sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+];
+
+// inside a year: jobs first, then products, then studies; newest first within each kind
+const rank: Record<Post["type"], number> = { flagship: 0, thread: 0, job: 1, project: 2, credential: 3 };
+const year = (p: Post) => (p.date ?? "").slice(0, 4);
+dated.sort(
+  (a, b) => year(b).localeCompare(year(a)) || rank[a.type] - rank[b.type] || (b.date ?? "").localeCompare(a.date ?? "")
+);
 
 export const feed: Post[] = [...pinned, ...dated];
+
+export interface Group {
+  // undefined for the pinned block at the top
+  year?: string;
+  posts: Post[];
+}
+
+export const groups: Group[] = [
+  { posts: pinned },
+  ...[...new Set(dated.map(year))].map((y) => ({ year: y, posts: dated.filter((p) => year(p) === y) })),
+];
 
 export const stats = {
   roles: experience.length,

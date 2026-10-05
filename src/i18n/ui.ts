@@ -1,4 +1,4 @@
-import type { Lang } from "../data/site";
+import { site, type Lang } from "../data/site";
 
 export const languages: Lang[] = ["pt", "en"];
 export const defaultLang: Lang = "pt";
@@ -24,8 +24,6 @@ export const ui = {
     "post.thread": "fio",
     "post.copy": "Copiar link",
     "post.copied": "Link copiado",
-    "post.role": "Meu papel",
-    "post.private": "Código privado, descrito por tema",
     "post.inProgress": "Em desenvolvimento",
     "post.project": "Novo produto",
     "post.projectWip": "Construindo agora",
@@ -34,6 +32,8 @@ export const ui = {
     "post.certs": "certificações concluídas",
     "thread.intro": "As perguntas que mais me fazem, respondidas de uma vez.",
     "thread.visitor": "visitante",
+    "feed.seeProject": "Ver projeto",
+    "thread.more": "Ver mais respostas",
     "feed.end": "Você chegou ao começo da timeline.",
     "rail.stack": "Minha stack",
     "rail.languages": "Idiomas",
@@ -90,7 +90,11 @@ export const ui = {
     "projects.open": "Abrir imagem",
     "projects.seeAll": "Ver todos os projetos",
     "nav.projects": "Projetos",
-    "footer.built": "Feito com Astro. Código no GitHub.",
+    "wa.label": "Chamar no WhatsApp",
+    "wa.message": "Oi Christian! Vi seu portfólio e queria conversar com você.",
+    "footer.built": "Feito com Astro.",
+    "footer.browse": "Navegar",
+    "footer.top": "Voltar ao topo",
     "skip": "Pular para o feed",
     "lang.switch": "EN",
     "lang.switchLabel": "Ver em inglês",
@@ -115,8 +119,6 @@ export const ui = {
     "post.thread": "thread",
     "post.copy": "Copy link",
     "post.copied": "Link copied",
-    "post.role": "My role",
-    "post.private": "Private source, described by theme",
     "post.inProgress": "In progress",
     "post.project": "New product",
     "post.projectWip": "Building right now",
@@ -125,6 +127,8 @@ export const ui = {
     "post.certs": "certifications earned",
     "thread.intro": "The questions I get the most, answered in one place.",
     "thread.visitor": "visitor",
+    "feed.seeProject": "See project",
+    "thread.more": "See more replies",
     "feed.end": "You reached the start of the timeline.",
     "rail.stack": "My stack",
     "rail.languages": "Languages",
@@ -181,7 +185,11 @@ export const ui = {
     "projects.open": "Open image",
     "projects.seeAll": "See all projects",
     "nav.projects": "Projects",
-    "footer.built": "Built with Astro. Source on GitHub.",
+    "wa.label": "Message me on WhatsApp",
+    "wa.message": "Hi Christian! I saw your portfolio and would like to talk.",
+    "footer.built": "Built with Astro.",
+    "footer.browse": "Browse",
+    "footer.top": "Back to top",
     "skip": "Skip to the feed",
     "lang.switch": "PT",
     "lang.switchLabel": "View in Portuguese",
@@ -224,4 +232,9 @@ export function pagePath(lang: Lang, page: Page): string {
   if (page === "contact") return contactPath(lang);
   if (page === "projects") return projectsPath(lang);
   return homePath(lang);
+}
+
+/** WhatsApp chat with the greeting already typed in. */
+export function whatsappLink(lang: Lang): string {
+  return `https://wa.me/${site.phone.e164.replace("+", "")}?text=${encodeURIComponent(ui[lang]["wa.message"])}`;
 }

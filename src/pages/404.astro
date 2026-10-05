@@ -1,0 +1,217 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { site, type Lang } from "../data/site";
+import { homePath, projectsPath, contactPath } from "../i18n/ui";
+
+// One static 404 for both languages: PT is rendered visible, and a tiny script
+// swaps to EN when the missing URL lives under /en.
+const copy = {
+  pt: {
+    title: "Página não encontrada",
+    lead: "Este post não existe.",
+    body: "O link pode estar quebrado, ou a página foi movida. A timeline continua no mesmo lugar.",
+    when: "agora",
+    home: "Voltar ao feed",
+    projects: "Ver projetos",
+    contact: "Falar comigo",
+  },
+  en: {
+    title: "Page not found",
+    lead: "This post doesn't exist.",
+    body: "The link may be broken, or the page was moved. The timeline is still where you left it.",
+    when: "now",
+    home: "Back to the feed",
+    projects: "See projects",
+    contact: "Get in touch",
+  },
+};
+const langs: Lang[] = ["pt", "en"];
+const handle = site.socials.github.split("/").pop();
+---
+
+<Base lang="pt" title={`404 · ${site.name}`} description={copy.pt.title}>
+  <main id="feed" class="wrap">
+    <div class="orbit" aria-hidden="true">
+      <span class="mark"></span>
+    </div>
+
+    <p class="code display" aria-hidden="true">4<span>0</span>4</p>
+
+    {
+      langs.map((l) => (
+        <section class="msg" data-lang={l} hidden={l !== "pt"} lang={l === "pt" ? "pt-BR" : "en"}>
+          <h1 class="sr-only">{copy[l].title}</h1>
+
+          <article class="post">
+            <img class="pic" src="/img/christian.webp" alt="" width="44" height="44" />
+            <div>
+              <p class="by">
+                <strong>{site.name}</strong>
+                <span class="dim">@{handle} · {copy[l].when}</span>
+              </p>
+              <p class="lead display">{copy[l].lead}</p>
+              <p class="body">{copy[l].body}</p>
+              <p class="path mono" data-path></p>
+            </div>
+          </article>
+
+          <nav class="actions" aria-label={copy[l].title}>
+            <a class="btn btn-accent" href={homePath(l)}>
+              <Icon name="home" />
+              {copy[l].home}
+            </a>
+            <a class="btn btn-ghost" href={projectsPath(l)}>
+              <Icon name="apps" />
+              {copy[l].projects}
+            </a>
+            <a class="btn btn-ghost" href={contactPath(l)}>
+              <Icon name="message" />
+              {copy[l].contact}
+            </a>
+          </nav>
+        </section>
+      ))
+    }
+  </main>
+</Base>
+
+<script>
+  const en = location.pathname === "/en" || location.pathname.startsWith("/en/");
+  document.querySelectorAll<HTMLElement>("[data-lang]").forEach((el) => {
+    el.hidden = el.dataset.lang !== (en ? "en" : "pt");
+  });
+  if (en) document.documentElement.lang = "en";
+  // show the address that failed, like a broken permalink
+  document.querySelectorAll<HTMLElement>("[data-path]").forEach((el) => {
+    el.textContent = location.pathname;
+  });
+</script>
+
+<style>
+  .wrap {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.25rem;
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* the logo mark, tinted with the theme ink through a mask */
+  .orbit {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .mark {
+    width: min(120vw, 62rem);
+    aspect-ratio: 723 / 359;
+    background: var(--ink);
+    opacity: 0.06;
+    -webkit-mask: url("/img/logo-mark.png") center / contain no-repeat;
+    mask: url("/img/logo-mark.png") center / contain no-repeat;
+    animation: drift 14s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from {
+      transform: rotate(-4deg) scale(1);
+    }
+    to {
+      transform: rotate(3deg) scale(1.05);
+    }
+  }
+
+  .code {
+    font-size: clamp(7rem, 30vw, 16rem);
+    font-weight: 800;
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+    margin-bottom: 2rem;
+  }
+  .code span {
+    color: var(--accent);
+  }
+
+  .msg {
+    width: min(100%, 34rem);
+  }
+  .msg[hidden] {
+    display: none;
+  }
+
+  .post {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 1rem 1.15rem 1.1rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .pic {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(1);
+  }
+  .by {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.35rem;
+    font-size: 0.95rem;
+  }
+  .by strong {
+    font-weight: 800;
+  }
+  .dim {
+    color: var(--ink-3);
+  }
+  .lead {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-top: 0.2rem;
+  }
+  .body {
+    margin-top: 0.35rem;
+    color: var(--ink-2);
+  }
+  .path {
+    display: inline-block;
+    max-width: 100%;
+    margin-top: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    background: var(--sunk);
+    color: var(--ink-3);
+    font-size: 0.8rem;
+    text-decoration: line-through;
+    overflow-wrap: anywhere;
+  }
+  .path:empty {
+    display: none;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark {
+      animation: none;
+    }
+  }
+</style>

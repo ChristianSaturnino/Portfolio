@@ -2,7 +2,7 @@
 import Shell from "./Shell.astro";
 import Icon, { type IconName } from "./Icon.astro";
 import { site, type Lang } from "../data/site";
-import { useTranslations } from "../i18n/ui";
+import { useTranslations, whatsappLink } from "../i18n/ui";
 
 interface Props {
   lang: Lang;
@@ -42,7 +42,7 @@ const channels: Channel[] = [
     icon: "whatsapp",
     label: t("contact.whatsapp"),
     value: site.phone.display,
-    href: `https://wa.me/${site.phone.e164.replace("+", "")}`,
+    href: whatsappLink(lang),
     copy: site.phone.display,
     extra: { label: t("contact.phone"), href: `tel:${site.phone.e164}` },
   },

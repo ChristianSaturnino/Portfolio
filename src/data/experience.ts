@@ -1,5 +1,7 @@
 export interface Job {
   company: string;
+  // file in public/img/companies; falls back to the first letter when missing
+  logo?: { src: string; width: number; height: number };
   url?: string;
   role: { pt: string; en: string };
   // first line of this job's post in the feed
@@ -9,9 +11,16 @@ export interface Job {
   bullets: { pt: string[]; en: string[] };
 }
 
+const logos = {
+  funcional: { src: "/img/companies/funcional.webp", width: 160, height: 160 },
+  pedbot: { src: "/img/companies/pedbot.webp", width: 354, height: 188 },
+  brunnschweiler: { src: "/img/companies/brunnschweiler.webp", width: 436, height: 136 },
+};
+
 export const experience: Job[] = [
   {
     company: "Funcional Health Tech",
+    logo: logos.funcional,
     role: { pt: "Desenvolvedor Full Stack Pleno", en: "Mid-Level Full Stack Developer" },
     headline: {
       pt: "Novo capítulo: Desenvolvedor Full Stack Pleno na Funcional Health Tech.",
@@ -32,6 +41,7 @@ export const experience: Job[] = [
   },
   {
     company: "Pedbot",
+    logo: logos.pedbot,
     role: { pt: "Desenvolvedor Full Stack Pleno", en: "Mid-Level Full Stack Developer" },
     headline: {
       pt: "Promovido a Desenvolvedor Full Stack Pleno na Pedbot.",
@@ -56,6 +66,7 @@ export const experience: Job[] = [
   },
   {
     company: "Pedbot",
+    logo: logos.pedbot,
     role: { pt: "Desenvolvedor Full Stack Júnior", en: "Junior Full Stack Developer" },
     headline: {
       pt: "Virei Desenvolvedor Full Stack Júnior na Pedbot.",
@@ -76,6 +87,7 @@ export const experience: Job[] = [
   },
   {
     company: "Pedbot",
+    logo: logos.pedbot,
     role: { pt: "Estagiário de Desenvolvimento", en: "Software Development Intern" },
     headline: {
       pt: "Primeiro dia como estagiário de desenvolvimento na Pedbot.",
@@ -96,6 +108,7 @@ export const experience: Job[] = [
   },
   {
     company: "Brunnschweiler Latina",
+    logo: logos.brunnschweiler,
     role: { pt: "Jovem Aprendiz · Monitoramento", en: "Apprentice · Monitoring" },
     headline: {
       pt: "Comecei como Jovem Aprendiz de Monitoramento na Brunnschweiler Latina.",
