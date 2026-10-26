@@ -15,7 +15,7 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: { pt: "Front-end", en: "Front-end" },
-    items: ["React", "Vue.js"],
+    items: ["React", "Next.js", "Vue.js"],
   },
   {
     label: { pt: "IA", en: "AI" },
@@ -26,6 +26,8 @@ export const skillGroups: SkillGroup[] = [
       { pt: "Agentes LLM", en: "LLM Agents" },
       { pt: "Engenharia de Prompts", en: "Prompt Engineering" },
       "Tool Calling",
+      "RAG",
+      "Guardrails",
     ],
   },
   {

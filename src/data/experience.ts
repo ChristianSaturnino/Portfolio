@@ -30,12 +30,10 @@ export const experience: Job[] = [
     start: "2026-10",
     bullets: {
       pt: [
-        "Desenvolvimento full stack de uma aplicação web, com back-end em NestJS/TypeScript e front-end em React.",
-        "Novas funcionalidades de ponta a ponta, integrando as diferentes camadas do sistema.",
+        "Desenvolvo funcionalidades de ponta a ponta em uma aplicação web de saúde, com NestJS/TypeScript e React.",
       ],
       en: [
-        "Full stack development of a web application, with a NestJS/TypeScript back-end and a React front-end.",
-        "New features delivered end to end, integrating the different layers of the system.",
+        "Build end-to-end features for a healthcare web application with NestJS/TypeScript and React.",
       ],
     },
   },
@@ -51,16 +49,16 @@ export const experience: Job[] = [
     start: "2025-12",
     bullets: {
       pt: [
-        "Um dos principais desenvolvedores da Maria, agente de vendas com IA que operou nos maiores players do varejo farmacêutico, trabalhando diariamente com LLMs em produção.",
-        "Modelei e evoluí os fluxos conversacionais com LangGraph e modelos GPT, com tool calling para integrar com os ERPs dos clientes e guardrails para manter as respostas seguras e alinhadas ao negócio.",
-        "Refinei prompts e lógica de fluxo continuamente a partir da análise de conversas reais.",
-        "Decisões de arquitetura, code reviews e otimização de APIs críticas.",
+        "Um dos principais desenvolvedores da MarIA, agente de vendas com IA nos maiores players do varejo farmacêutico: 1.000+ conversas por dia, 10% de conversão em pedidos pagos e 75% de ganho de eficiência no atendimento.",
+        "Case apresentado no Abrafarma Future Trends 2025.",
+        "Modelei os fluxos com LangGraph e GPT, com tool calling integrado aos ERPs dos clientes e guardrails alinhados às regras de negócio; contribuí com RAG e observabilidade.",
+        "Refinei prompts a partir de conversas reais, participei de decisões de arquitetura, conduzi code reviews e otimizei APIs críticas com profiling de queries.",
       ],
       en: [
-        "One of the lead developers of Maria, an AI sales agent deployed at the largest players in pharmaceutical retail, working daily with LLMs in production.",
-        "Designed and evolved conversational flows with LangGraph and GPT models, with tool calling to integrate with clients' ERPs and guardrails to keep responses safe and aligned with business rules.",
-        "Continuously refined prompts and flow logic based on the analysis of real conversations.",
-        "Architecture decisions, code reviews and optimization of critical APIs.",
+        "One of the lead developers of MarIA, an AI sales agent deployed at Brazil's largest pharmacy chains: 1,000+ conversations a day, 10% paid-order conversion and a 75% gain in customer service efficiency.",
+        "Case presented at Abrafarma Future Trends 2025, the national pharmacy chain association's annual conference.",
+        "Designed conversational flows with LangGraph and GPT models, with tool calling integrated into clients' ERPs and guardrails aligned with business rules; contributed to RAG and observability.",
+        "Refined prompts based on real production conversations, contributed to architecture decisions, ran code reviews and optimized critical APIs through query profiling.",
       ],
     },
   },
@@ -76,12 +74,12 @@ export const experience: Job[] = [
     start: "2024-08",
     bullets: {
       pt: [
-        "Construí a infraestrutura da Maria com microsserviços em NestJS, RabbitMQ e controles de concorrência com Redis para processamento distribuído em alto volume.",
-        "APIs RESTful e integrações com sistemas de clientes.",
+        "Construí a infraestrutura da MarIA com microsserviços em NestJS, mensageria com RabbitMQ e controles de concorrência com Redis para processamento distribuído em alto volume.",
+        "Desenvolvi APIs RESTful (NestJS e Laravel) e integrações com sistemas de clientes.",
       ],
       en: [
-        "Built Maria's infrastructure with NestJS microservices, RabbitMQ and Redis-based concurrency controls for high-volume distributed processing.",
-        "RESTful APIs and integrations with client systems.",
+        "Built MarIA's infrastructure with NestJS microservices, RabbitMQ messaging and Redis-based concurrency controls for high-volume distributed processing.",
+        "Developed RESTful APIs (NestJS and Laravel) and integrations with client systems.",
       ],
     },
   },
@@ -109,7 +107,7 @@ export const experience: Job[] = [
   {
     company: "Brunnschweiler Latina",
     logo: logos.brunnschweiler,
-    role: { pt: "Jovem Aprendiz · Monitoramento", en: "Apprentice · Monitoring" },
+    role: { pt: "Aprendiz em Monitoramento", en: "Monitoring Apprentice" },
     headline: {
       pt: "Comecei como Jovem Aprendiz de Monitoramento na Brunnschweiler Latina.",
       en: "Started as a Monitoring Apprentice at Brunnschweiler Latina.",
@@ -118,7 +116,7 @@ export const experience: Job[] = [
     start: "2022-02",
     bullets: {
       pt: ["Apoio à gestão de projetos e acompanhamento de indicadores operacionais."],
-      en: ["Supported project management and the tracking of operational KPIs."],
+      en: ["Supported project management and tracked operational KPIs."],
     },
   },
 ];

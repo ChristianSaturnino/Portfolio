@@ -4,8 +4,8 @@ export const site = {
   name: "Christian Saturnino",
   fullName: "Christian Saturnino Andrade Oliveira",
   role: {
-    pt: "Engenheiro de Software · Backend & IA",
-    en: "Software Engineer · Backend & AI",
+    pt: "Engenheiro de Software · Backend & Agentes de IA",
+    en: "Software Engineer · Backend & AI Agents",
   },
   location: {
     pt: "Marília, SP · Brasil",
@@ -31,7 +31,7 @@ export const site = {
     en: "I build microservices and LLM agents that run in production.",
   },
   intro: {
-    pt: "Engenheiro de software com experiência em back-end, sistemas distribuídos e agentes de IA em produção, com progressão de estagiário a desenvolvedor pleno. Trabalho com TypeScript, Node.js/NestJS, React, PostgreSQL, Redis e RabbitMQ, e construo agentes com LangGraph, modelos GPT, tool calling e engenharia de prompts.",
-    en: "Software engineer with experience in back-end development, distributed systems and AI agents in production, progressing from intern to mid-level developer. I work with TypeScript, Node.js/NestJS, React, PostgreSQL, Redis and RabbitMQ, and build agents with LangGraph, GPT models, tool calling and prompt engineering.",
+    pt: "Engenheiro de software com quase 3 anos em back-end distribuído e agentes de IA em produção. Um dos principais desenvolvedores da MarIA, agente de vendas com LLM com 1.000+ conversas por dia e 10% de conversão em pedidos pagos. Trabalho com TypeScript, Node.js/NestJS, LangGraph, RabbitMQ, Redis e PostgreSQL.",
+    en: "Software engineer with nearly 3 years building distributed back-end systems and AI agents in production. One of the lead developers of MarIA, an LLM-powered sales agent handling 1,000+ conversations a day with a 10% paid-order conversion rate. I work with TypeScript, Node.js/NestJS, LangGraph, RabbitMQ, Redis and PostgreSQL.",
   },
 } as const;
