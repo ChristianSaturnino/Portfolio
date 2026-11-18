@@ -30,10 +30,90 @@ const shot = (src: string, device: Shot["device"], pt: string, en: string): Shot
   ...(device === "phone" ? { width: 560, height: 1212 } : { width: 1440, height: 900 }),
 });
 
+// Ordem = relevancia para o CV (agentes LLM, TS/NestJS, Postgres/Redis primeiro).
 // Produtos proprios, construidos ponta a ponta. Repositorios privados, descritos
 // por tema, sem nome de repo, conforme pedido. Links ficam vazios ate o Christian
 // confirmar deploys/videos.
 export const projects: Project[] = [
+  {
+    slug: "ai-support-agent",
+    title: {
+      pt: "Agente de IA para atendimento de varejo",
+      en: "AI customer service agent for retail",
+    },
+    kicker: { pt: "Agente de IA · LangGraph · avaliação", en: "AI agent · LangGraph · evaluation" },
+    summary: {
+      pt: "Agente que atende clientes de uma loja de instrumentos musicais: produtos e estoque, preços e promoções, comparação entre modelos, status de pedido e políticas da loja. A ideia central é que o modelo interpreta e escreve, mas quem decide é o código: a mensagem vira uma estrutura validada, cada intenção roda um handler conhecido (SQL, regras de preço, busca nas seções do manual) e a resposta é conferida contra os dados antes de sair. Pedido só aparece depois de verificar o e-mail do cliente, e tentativas de burlar as regras não passam. Validado com uma bateria de mais de 500 conversas de avaliação.",
+      en: "Agent that serves customers of a musical instrument store: products and stock, prices and promotions, model comparisons, order status and store policies. The core idea is that the model interprets and writes, but code decides: the message becomes a validated structure, each intent runs a known handler (SQL, pricing rules, search over the policy manual's sections) and the reply is checked against the data before it goes out. Orders only show after the customer's email is verified, and attempts to override the rules get nowhere. Validated with an evaluation suite of 500+ conversations.",
+    },
+    contribution: {
+      pt: "Solo: arquitetura do fluxo, orquestração com LangGraph, contratos com Pydantic, camada de dados, defesas contra prompt injection, suíte de avaliação com medição de custo e latência, e interface de chat.",
+      en: "Solo: flow architecture, LangGraph orchestration, Pydantic contracts, data layer, prompt-injection defenses, evaluation suite with cost and latency tracking, and the chat interface.",
+    },
+    stack: ["Python", "LangGraph", "OpenAI", "Pydantic", "SQLite", "pypdf", "Streamlit", "pytest"],
+    shots: [
+      shot("ai-support-agent-1.webp", "desktop", "Conversa real: o agente lista guitarras, compara dois modelos e ajuda a escolher", "Real conversation: the agent lists guitars, compares two models and helps choose"),
+      shot("ai-support-agent-2.webp", "desktop", "Consulta de pedido com verificação de e-mail e uma tentativa de burlar as regras", "Order lookup with email verification and an attempt to override the rules"),
+    ],
+    previewNote: {
+      pt: "Conversas reais gravadas com o agente, sem edição, com dados fictícios.",
+      en: "Real recorded conversations with the agent, unedited, on made-up data.",
+    },
+    year: "2026",
+  },
+  {
+    slug: "construction-vision",
+    title: {
+      pt: "Monitoramento visual de obras com IA",
+      en: "AI visual monitoring for construction sites",
+    },
+    kicker: { pt: "Visão computacional · IoT · SaaS", en: "Computer vision · IoT · SaaS" },
+    summary: {
+      pt: "Plataforma que acompanha obras por câmeras: um agente captura imagens em intervalos (webcam ou RTSP), a API compara cada imagem com a referência da zona e só registra uma mudança quando a captura seguinte a confirma. Um modelo de visão (local com Ollama ou Gemini, com autorização dupla para mandar imagem para fora) descreve o que mudou, e cada evento guarda as imagens que o sustentam. Cada região vira uma memória com histórico só de inserção, separando fato observado, hipótese da IA e decisão humana, com revisão, comparador antes/depois e um laboratório que mede o detector contra gabarito humano.",
+      en: "Platform that monitors construction sites through cameras: an agent captures images at intervals (webcam or RTSP), the API compares each image with the zone's reference and only records a change once the next capture confirms it. A vision model (local via Ollama, or Gemini behind a two-step opt-in for sending images out) describes what changed, and every event keeps the images that back it. Each region becomes an append-only memory that keeps observed fact, AI hypothesis and human decision apart, with review, a before/after comparator and a lab that scores the detector against human ground truth.",
+    },
+    contribution: {
+      pt: "Solo, ponta a ponta: agente de captura com fila local cifrada, API em NestJS com filas, pipeline de imagem, integração com modelos de visão, painel em Next.js e benchmarks com cenas sintéticas e time-lapses públicos.",
+      en: "Solo, end to end: capture agent with an encrypted local queue, NestJS API with job queues, image pipeline, vision-model integration, Next.js dashboard and benchmarks on synthetic scenes and public time-lapses.",
+    },
+    stack: ["TypeScript", "NestJS", "Next.js", "PostgreSQL", "Drizzle", "Redis / BullMQ", "S3 / MinIO", "Sharp", "Ollama", "Gemini", "FFmpeg / RTSP", "Zod", "Docker"],
+    status: { pt: "MVP", en: "MVP" },
+    shots: [
+      shot("construction-vision-1.webp", "desktop", "Memória de uma região: estado atual, linha do tempo e comparador antes/depois", "A region's memory: current state, timeline and before/after comparator"),
+      shot("construction-vision-2.webp", "desktop", "Resumo do dia da obra, com cada frase ligada às imagens que a sustentam", "Daily site summary, each sentence linked to the images behind it"),
+    ],
+    previewNote: {
+      pt: "Rodando localmente com uma cena sintética de teste, sem obra real.",
+      en: "Running locally on a synthetic test scene, not a real site.",
+    },
+    year: "2026",
+  },
+  {
+    slug: "agent-skill-marketplace",
+    title: {
+      pt: "Marketplace de skills para agentes de IA",
+      en: "Skill marketplace for AI agents",
+    },
+    kicker: { pt: "Marketplace SaaS · pagamentos", en: "SaaS marketplace · payments" },
+    summary: {
+      pt: "Plataforma onde desenvolvedores publicam e monetizam “skills” reutilizáveis para agentes de IA. Back-end de alta performance com Laravel + Octane, pagamentos e repasses a vendedores via Stripe Connect, e front-end em Next.js. Monorepo containerizado com deploy automatizado.",
+      en: "Platform where developers publish and monetize reusable “skills” for AI agents. High-performance back-end with Laravel + Octane, payments and seller payouts via Stripe Connect, and a Next.js front-end. Containerized monorepo with automated deploy.",
+    },
+    contribution: {
+      pt: "Full-stack + infra, solo: modelagem do marketplace, API, integração de pagamentos com split, front-end e ambiente Docker.",
+      en: "Full-stack + infra, solo: marketplace modeling, API, split-payment integration, front-end and Docker environment.",
+    },
+    stack: ["Laravel 12", "PHP 8.4", "Octane / Swoole", "PostgreSQL", "Redis", "Stripe Connect", "Next.js 15", "React 19", "Docker"],
+    shots: [
+      shot("agent-skill-marketplace-1.webp", "desktop", "Página inicial do marketplace de skills de IA", "Home page of the AI skills marketplace"),
+      shot("agent-skill-marketplace-2.webp", "desktop", "Biblioteca de skills com categorias e filtros", "Skill library with categories and filters"),
+    ],
+    previewNote: {
+      pt: "Rodando localmente com dados de exemplo.",
+      en: "Running locally with demo data.",
+    },
+    year: "2026",
+  },
   {
     slug: "auction-triage",
     title: {
@@ -61,28 +141,54 @@ export const projects: Project[] = [
     year: "2026",
   },
   {
-    slug: "agent-skill-marketplace",
+    slug: "call-copilot",
     title: {
-      pt: "Marketplace de skills para agentes de IA",
-      en: "Skill marketplace for AI agents",
+      pt: "Copiloto ao vivo para conversas em inglês",
+      en: "Live copilot for English conversations",
     },
-    kicker: { pt: "Marketplace SaaS · pagamentos", en: "SaaS marketplace · payments" },
+    kicker: { pt: "App desktop · áudio em tempo real · IA", en: "Desktop app · real-time audio · AI" },
     summary: {
-      pt: "Plataforma onde desenvolvedores publicam e monetizam “skills” reutilizáveis para agentes de IA. Back-end de alta performance com Laravel + Octane, pagamentos e repasses a vendedores via Stripe Connect, e front-end em Next.js. Monorepo containerizado com deploy automatizado.",
-      en: "Platform where developers publish and monetize reusable “skills” for AI agents. High-performance back-end with Laravel + Octane, payments and seller payouts via Stripe Connect, and a Next.js front-end. Containerized monorepo with automated deploy.",
+      pt: "App para Windows que acompanha chamadas e entrevistas em inglês: captura o áudio que o computador reproduz, mostra a transcrição em tempo real e a tradução em português enquanto a pessoa ainda está falando. Também transforma uma ideia digitada em português numa frase curta em inglês, no nível escolhido. Só envia trechos com fala detectada, estima o custo ao vivo e para sozinho ao bater o teto de tempo ou de gasto. Não grava áudio em disco e guarda a chave no cofre do Windows.",
+      en: "Windows app that follows calls and interviews in English: it captures the audio the computer plays, shows a live transcript and the Portuguese translation while the person is still speaking. It also turns an idea typed in Portuguese into a short English sentence at the chosen level. It only sends audio where speech was detected, estimates cost live and stops itself at the time or spending cap. No audio is written to disk and the API key lives in the Windows credential vault.",
     },
     contribution: {
-      pt: "Full-stack + infra, solo: modelagem do marketplace, API, integração de pagamentos com split, front-end e ambiente Docker.",
-      en: "Full-stack + infra, solo: marketplace modeling, API, split-payment integration, front-end and Docker environment.",
+      pt: "Solo: captura de áudio do sistema (WASAPI loopback) com detecção de voz, transcrição por WebSocket em streaming, tradução incremental, controle de custo, interface em Qt e testes.",
+      en: "Solo: system audio capture (WASAPI loopback) with voice activity detection, streaming transcription over WebSocket, incremental translation, cost control, Qt interface and tests.",
     },
-    stack: ["Laravel 12", "PHP 8.4", "Octane / Swoole", "PostgreSQL", "Redis", "Stripe Connect", "Next.js 15", "React 19", "Docker"],
+    stack: ["Python", "PySide6 / Qt", "WASAPI", "OpenAI Realtime", "WebSocket", "asyncio", "NumPy", "pytest"],
     shots: [
-      shot("agent-skill-marketplace-1.webp", "desktop", "Página inicial do marketplace de skills de IA", "Home page of the AI skills marketplace"),
-      shot("agent-skill-marketplace-2.webp", "desktop", "Biblioteca de skills com categorias e filtros", "Skill library with categories and filters"),
+      shot("call-copilot-1.webp", "desktop", "Janela ao vivo: transcrição em inglês, tradução em português e frase sugerida", "Live window: English transcript, Portuguese translation and suggested sentence"),
+      shot("call-copilot-2.webp", "desktop", "Configuração com limites de custo e o resumo ao fim da sessão", "Settings with cost caps and the end-of-session summary"),
     ],
     previewNote: {
-      pt: "Rodando localmente com dados de exemplo.",
-      en: "Running locally with demo data.",
+      pt: "Modo demonstração, com falas simuladas e sem chamadas à API.",
+      en: "Demo mode, with simulated speech and no API calls.",
+    },
+    year: "2026",
+  },
+  {
+    slug: "ecommerce-ops",
+    title: {
+      pt: "Painel de operação para e-commerce",
+      en: "E-commerce operations dashboard",
+    },
+    kicker: { pt: "Full-stack · integração Shopify", en: "Full-stack · Shopify integration" },
+    summary: {
+      pt: "Painel interno para gestão de um e-commerce: produtos, kits, estoque e validades, vendas, despesas, portal de parceiros e importação de planilhas. Sincronização automática com a Shopify via API e webhooks.",
+      en: "Internal dashboard to run an e-commerce operation: products, kits, stock and expiry control, sales, expenses, a partner portal and spreadsheet imports. Automatic sync with Shopify via API and webhooks.",
+    },
+    contribution: {
+      pt: "Full-stack, solo: modelagem do banco, aplicação, integração com a Shopify e portal de parceiros com autenticação.",
+      en: "Full-stack, solo: database modeling, application, Shopify integration and an authenticated partner portal.",
+    },
+    stack: ["Next.js", "React", "TypeScript", "Supabase / PostgreSQL", "Shopify API", "Tailwind CSS"],
+    shots: [
+      shot("ecommerce-ops-1.webp", "desktop", "Dashboard com vendas, receita, lucro e estoque do mês", "Dashboard with the month's sales, revenue, profit and stock"),
+      shot("ecommerce-ops-2.webp", "desktop", "Cadastro de produtos com estoque, validade e status", "Product catalog with stock, expiry and status"),
+    ],
+    previewNote: {
+      pt: "Rodando localmente com dados fictícios, sem dados reais da operação.",
+      en: "Running locally with made-up data, no real business data.",
     },
     year: "2026",
   },
@@ -114,28 +220,54 @@ export const projects: Project[] = [
     year: "2026",
   },
   {
-    slug: "ecommerce-ops",
+    slug: "privacy-cleaner",
     title: {
-      pt: "Painel de operação para e-commerce",
-      en: "E-commerce operations dashboard",
+      pt: "Limpeza de metadados de fotos e textos",
+      en: "Photo and text metadata cleaner",
     },
-    kicker: { pt: "Full-stack · integração Shopify", en: "Full-stack · Shopify integration" },
+    kicker: { pt: "Web app · privacidade · processamento local", en: "Web app · privacy · on-device processing" },
     summary: {
-      pt: "Painel interno para gestão de um e-commerce: produtos, kits, estoque e validades, vendas, despesas, portal de parceiros e importação de planilhas. Sincronização automática com a Shopify via API e webhooks.",
-      en: "Internal dashboard to run an e-commerce operation: products, kits, stock and expiry control, sales, expenses, a partner portal and spreadsheet imports. Automatic sync with Shopify via API and webhooks.",
+      pt: "Site que mostra e remove o que fotos e textos carregam escondido antes de serem compartilhados. Nas fotos (JPEG, PNG e WebP): localização, modelo do celular, datas, sinais de IA (C2PA) e miniaturas, sem recomprimir a imagem: os dados de imagem são copiados byte a byte e conferidos por SHA-256. Nos textos: caracteres invisíveis, mensagens escondidas com caracteres TAG e espaços especiais, preservando emojis compostos. Tudo roda no navegador, nada é enviado, e o site é exportado como HTML estático, em português e inglês.",
+      en: "Site that shows and removes what photos and texts carry hidden before they are shared. For photos (JPEG, PNG and WebP): location, phone model, dates, AI signals (C2PA) and thumbnails, without recompressing the image: image data is copied byte for byte and verified with SHA-256. For text: invisible characters, messages hidden with TAG characters and special spaces, keeping compound emojis intact. Everything runs in the browser, nothing is uploaded, and the site is exported as static HTML, in Portuguese and English.",
     },
     contribution: {
-      pt: "Full-stack, solo: modelagem do banco, aplicação, integração com a Shopify e portal de parceiros com autenticação.",
-      en: "Full-stack, solo: database modeling, application, Shopify integration and an authenticated partner portal.",
+      pt: "Solo: leitores dos formatos de imagem e de EXIF/XMP/IPTC/ICC/C2PA escritos do zero, motor de limpeza com verificação, motor de texto, interface bilíngue e testes com imagens reais.",
+      en: "Solo: image-container and EXIF/XMP/IPTC/ICC/C2PA readers written from scratch, cleaning engine with verification, text engine, bilingual interface and tests with real images.",
     },
-    stack: ["Next.js", "React", "TypeScript", "Supabase / PostgreSQL", "Shopify API", "Tailwind CSS"],
+    stack: ["TypeScript", "Next.js", "React", "Tailwind CSS", "Web Crypto", "Vitest"],
     shots: [
-      shot("ecommerce-ops-1.webp", "desktop", "Dashboard com vendas, receita, lucro e estoque do mês", "Dashboard with the month's sales, revenue, profit and stock"),
-      shot("ecommerce-ops-2.webp", "desktop", "Cadastro de produtos com estoque, validade e status", "Product catalog with stock, expiry and status"),
+      shot("privacy-cleaner-1.webp", "desktop", "Foto analisada: localização, aparelho, data e programas encontrados nos metadados", "Analyzed photo: location, device, date and software found in the metadata"),
+      shot("privacy-cleaner-2.webp", "desktop", "Texto com caracteres invisíveis e uma mensagem escondida encontrada", "Text with invisible characters and a hidden message found"),
     ],
     previewNote: {
-      pt: "Rodando localmente com dados fictícios, sem dados reais da operação.",
-      en: "Running locally with made-up data, no real business data.",
+      pt: "Rodando localmente, com uma foto e um texto de teste.",
+      en: "Running locally, with a test photo and text.",
+    },
+    year: "2026",
+  },
+  {
+    slug: "contract-generator",
+    title: {
+      pt: "Gerador de contratos no navegador",
+      en: "In-browser contract generator",
+    },
+    kicker: { pt: "Ferramenta interna · segurança", en: "Internal tool · security" },
+    summary: {
+      pt: "Sistema interno para uma empresa de intermediação de veículos: a pessoa escolhe os documentos (contratos, procuração e declaração, agrupados em kits de entrada e saída), preenche um formulário único, revisa editando o texto direto na tela e imprime, salva em PDF ou baixa em Word. Valida CPF, CNPJ (inclusive o alfanumérico), placa, RENAVAM e chassi, e preenche o endereço pelo CEP. Sem banco e sem servidor: os dados ficam só na memória da aba, a política de segurança (CSP) impede envio para outros domínios e o acesso é restrito aos funcionários.",
+      en: "Internal system for a vehicle brokerage company: the user picks the documents (contracts, power of attorney and a release form, grouped into intake and sale kits), fills a single form, reviews by editing the text right on screen, then prints, saves as PDF or downloads as Word. It validates Brazilian tax IDs (including the new alphanumeric CNPJ), plates, vehicle registry numbers and VINs, and fills the address from the postal code. No database and no server: data only lives in the tab's memory, a strict CSP blocks sending anything to other domains and access is limited to staff.",
+    },
+    contribution: {
+      pt: "Solo: modelagem dos documentos, formulário com validações, geração de Word sem bibliotecas, política de segurança e deploy com controle de acesso.",
+      en: "Solo: document templates, form with validations, Word generation with no libraries, security policy and deploy with access control.",
+    },
+    stack: ["TypeScript", "Vite", "Cloudflare Pages", "Cloudflare Access", "Vitest"],
+    shots: [
+      shot("contract-generator-1.webp", "desktop", "Revisão do documento gerado, editável antes de imprimir", "Generated document review, editable before printing"),
+      shot("contract-generator-2.webp", "desktop", "Formulário único com os dados do vendedor e do veículo", "Single form with seller and vehicle data"),
+    ],
+    previewNote: {
+      pt: "Rodando localmente com dados fictícios e sem a marca da empresa.",
+      en: "Running locally with made-up data and without the company's branding.",
     },
     year: "2026",
   },

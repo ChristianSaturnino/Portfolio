@@ -30,7 +30,7 @@ const core = new Set([
 const aliases: Record<string, string[]> = {
   REST: ["restful"],
   GCP: ["google cloud"],
-  "OpenAI API": ["gpt"],
+  "OpenAI API": ["gpt", "openai"],
   "Agentes LLM": ["llm"],
   "Engenharia de Prompts": ["prompt"],
   Microsserviços: ["microsserviç", "microservice"],
