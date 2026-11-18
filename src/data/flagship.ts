@@ -6,7 +6,7 @@ export interface Fact {
 }
 
 // The flagship case: MarIA, the AI sales agent built at Pedbot.
-// Pinned at the top of the feed.
+// Shown as the featured case on the home page.
 export const flagship = {
   name: "MarIA",
   at: "Pedbot",
@@ -20,6 +20,20 @@ export const flagship = {
     pt: "Projeto desenvolvido durante a minha atuação na Pedbot. Participei de ponta a ponta: da modelagem dos fluxos com LangGraph, modelos GPT, tool calling e guardrails, à construção dos microsserviços em NestJS e RabbitMQ com controles de concorrência em Redis para processamento distribuído. Prompts e lógica de fluxo eram refinados continuamente a partir da análise de conversas reais. O case foi apresentado no Abrafarma Future Trends 2025.",
     en: "Built while I was at Pedbot. I worked on it end to end: from designing the flows with LangGraph, GPT models, tool calling and guardrails, to building the NestJS and RabbitMQ microservices with Redis concurrency controls for distributed processing. Prompts and flow logic were continuously refined based on the analysis of real conversations. The case was presented at Abrafarma Future Trends 2025.",
   },
+  // what I did on it, three lines for the home card
+  did: {
+    pt: [
+      "Modelei os fluxos com LangGraph e GPT, com tool calling nos ERPs dos clientes e guardrails alinhados às regras de negócio.",
+      "Construí a infraestrutura: microsserviços em NestJS, mensageria com RabbitMQ e controles de concorrência com Redis.",
+      "Refinei prompts a partir de conversas reais e contribuí com RAG e observabilidade.",
+    ],
+    en: [
+      "Designed the flows with LangGraph and GPT, with tool calling into clients' ERPs and guardrails aligned with business rules.",
+      "Built the infrastructure: NestJS microservices, RabbitMQ messaging and Redis concurrency controls.",
+      "Refined prompts from real conversations and contributed to RAG and observability.",
+    ],
+  },
+  event: { pt: "Apresentado no Abrafarma Future Trends 2025", en: "Presented at Abrafarma Future Trends 2025" },
   flow: {
     pt: ["mensagem", "LangGraph", "tools · ERP", "GPT", "guardrails", "resposta"],
     en: ["message", "LangGraph", "tools · ERP", "GPT", "guardrails", "reply"],

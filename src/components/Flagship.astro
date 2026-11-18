@@ -1,0 +1,260 @@
+---
+import Icon from "./Icon.astro";
+import { flagship } from "../data/flagship";
+import type { Lang } from "../data/site";
+import { useTranslations } from "../i18n/ui";
+
+// The MarIA case: the most prominent block on the home page.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const name = flagship.name; // "MarIA": the "IA" gets the accent
+const flow = flagship.flow[lang];
+---
+
+<section class="wrap block" id="maria" aria-labelledby="maria-h">
+  <div class="card">
+    <div class="top">
+      <p class="eyebrow">{t("home.case")} · {flagship.at}</p>
+      <p class="live"><span class="dot" aria-hidden="true"></span>{flagship.status[lang]}</p>
+    </div>
+
+    <h2 id="maria-h" class="display">{name.slice(0, -2)}<span class="hl">{name.slice(-2)}</span></h2>
+    <p class="tagline">{flagship.tagline[lang]}</p>
+
+    <dl class="facts">
+      {
+        flagship.facts.map((f) => (
+          <div class="fact">
+            <dt class="k">{f.k[lang]}</dt>
+            <dd>
+              <span class="n display">{f.n?.[lang]}</span>
+              <span class="v">{f.v[lang]}</span>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="cols">
+      <div>
+        <h3 class="label">{t("home.did")}</h3>
+        <ul class="did">
+          {
+            flagship.did[lang].map((d) => (
+              <li>
+                <Icon name="check" />
+                <span>{d}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="label">{t("home.how")}</h3>
+        <ol class="flow">
+          {
+            flow.map((step, i) => (
+              <li class:list={{ edge: i === 0 || i === flow.length - 1 }}>
+                <span>{step}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <ul class="chips" aria-label="Stack">
+          {flagship.stack.map((s) => <li class="chip">{s}</li>)}
+        </ul>
+        <p class="event"><Icon name="award" />{flagship.event[lang]}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .card {
+    position: relative;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+    border-radius: 1.75rem;
+    padding: clamp(1.75rem, 5vw, 3.5rem);
+  }
+  /* accent rule along the top edge */
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: var(--accent);
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .eyebrow {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent);
+  }
+  h2 {
+    margin-top: 1.25rem;
+    font-size: clamp(3rem, 7vw, 5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  .hl {
+    color: var(--accent);
+  }
+  .tagline {
+    margin-top: 1rem;
+    max-width: 38rem;
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+    line-height: 1.4;
+  }
+
+  /* the numbers: tinted tiles, accent figures */
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .fact {
+    padding: 1.5rem;
+    border-radius: 1.25rem;
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  .k {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .fact dd {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+  }
+  .n {
+    font-size: clamp(2.6rem, 5.5vw, 4rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+  }
+  .v {
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 2rem 3rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  .label {
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .did {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .did li {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--ink-2);
+  }
+  .did :global(.icon) {
+    margin-top: 0.2rem;
+    color: var(--accent-text);
+  }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+  }
+  .flow li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+  .flow li span {
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.5rem;
+    background: var(--sunk);
+    border: 1px solid var(--line);
+  }
+  .flow li.edge span {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    color: var(--accent-text);
+  }
+  .flow li:not(:last-child)::after {
+    content: "→";
+    color: var(--ink-3);
+  }
+  .event {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .event :global(.icon) {
+    color: var(--accent-text);
+  }
+
+  @media (max-width: 760px) {
+    .facts,
+    .cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .fact {
+      padding: 1.25rem;
+    }
+  }
+</style>

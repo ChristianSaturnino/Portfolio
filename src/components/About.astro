@@ -1,0 +1,177 @@
+---
+import Icon from "./Icon.astro";
+import { about } from "../data/about";
+import type { Lang } from "../data/site";
+import { useTranslations, projectsPath } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const hrefFor = (h?: string) => (h === "projects" ? projectsPath(lang) : h);
+---
+
+<section class="wrap block" id="sobre" aria-labelledby="sobre-h">
+  <div class="intro">
+    <img
+      class="portrait"
+      src={about.photo.src}
+      alt={about.photo.alt[lang]}
+      width={about.photo.width}
+      height={about.photo.height}
+      loading="lazy"
+      decoding="async"
+    />
+    <div class="text">
+      <h2 id="sobre-h" class="sec-title display">{t("home.about")}</h2>
+      <p class="lead display">{about.lead[lang]}</p>
+      {about.body[lang].map((p) => <p class="body">{p}</p>)}
+    </div>
+  </div>
+
+  <h3 class="likes">{t("home.likes")}</h3>
+  <ul class="posts">
+    {
+      about.interests.map((i) => {
+        const href = hrefFor(i.href);
+        const Tag = href ? "a" : "div";
+        return (
+          <li>
+            <Tag class="post" {...(href ? { href } : {})}>
+              <img
+                src={i.img.src}
+                alt={i.img.alt[lang]}
+                width={i.img.width}
+                height={i.img.height}
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="tag">{i.title[lang]}</span>
+              <span class="cap">
+                {i.caption[lang]}
+                {href && <Icon name="arrow" />}
+              </span>
+            </Tag>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<style>
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .portrait {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 40%;
+    border-radius: 1.5rem;
+  }
+  .lead {
+    margin-top: 1.25rem;
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+  .body {
+    margin-top: 1rem;
+    max-width: 36rem;
+    font-size: 1.07rem;
+    color: var(--ink-2);
+  }
+
+  .likes {
+    margin: clamp(3rem, 7vw, 4.5rem) 0 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .post {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .post img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    border-radius: 1.1rem;
+    border: 1px solid var(--line);
+    transition: transform 0.35s var(--ease);
+  }
+  .post img {
+    object-fit: cover;
+  }
+  .post:hover img {
+    transform: translateY(-4px);
+  }
+  .tag {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .cap {
+    font-size: 0.93rem;
+    color: var(--ink-2);
+  }
+  .cap :global(.icon) {
+    display: inline;
+    vertical-align: -0.2em;
+    margin-left: 0.25rem;
+    color: var(--accent-text);
+  }
+  a.post:hover .cap {
+    color: var(--ink);
+  }
+
+  @media (max-width: 860px) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .portrait {
+      max-width: 26rem;
+    }
+    /* posts become a swipeable row, like stories */
+    .posts {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 1rem;
+      margin: 0 -1rem;
+      padding: 0 1rem 0.5rem;
+      scrollbar-width: none;
+    }
+    .posts::-webkit-scrollbar {
+      display: none;
+    }
+    .posts li {
+      flex: 0 0 68%;
+      max-width: 16rem;
+      scroll-snap-align: start;
+    }
+  }
+</style>

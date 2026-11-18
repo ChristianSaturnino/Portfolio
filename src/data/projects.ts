@@ -2,6 +2,8 @@ export interface Project {
   slug: string;
   title: { pt: string; en: string };
   kicker: { pt: string; en: string };
+  // one line for the home page cards; falls back to the kicker
+  blurb?: { pt: string; en: string };
   summary: { pt: string; en: string };
   contribution: { pt: string; en: string };
   stack: string[];
@@ -42,6 +44,10 @@ export const projects: Project[] = [
       en: "AI customer service agent for retail",
     },
     kicker: { pt: "Agente de IA · LangGraph · avaliação", en: "AI agent · LangGraph · evaluation" },
+    blurb: {
+      pt: "O modelo interpreta, o código decide. Validado em mais de 500 conversas.",
+      en: "The model interprets, the code decides. Validated on 500+ conversations.",
+    },
     summary: {
       pt: "Agente que atende clientes de uma loja de instrumentos musicais: produtos e estoque, preços e promoções, comparação entre modelos, status de pedido e políticas da loja. A ideia central é que o modelo interpreta e escreve, mas quem decide é o código: a mensagem vira uma estrutura validada, cada intenção roda um handler conhecido (SQL, regras de preço, busca nas seções do manual) e a resposta é conferida contra os dados antes de sair. Pedido só aparece depois de verificar o e-mail do cliente, e tentativas de burlar as regras não passam. Validado com uma bateria de mais de 500 conversas de avaliação.",
       en: "Agent that serves customers of a musical instrument store: products and stock, prices and promotions, model comparisons, order status and store policies. The core idea is that the model interprets and writes, but code decides: the message becomes a validated structure, each intent runs a known handler (SQL, pricing rules, search over the policy manual's sections) and the reply is checked against the data before it goes out. Orders only show after the customer's email is verified, and attempts to override the rules get nowhere. Validated with an evaluation suite of 500+ conversations.",
@@ -68,6 +74,10 @@ export const projects: Project[] = [
       en: "AI visual monitoring for construction sites",
     },
     kicker: { pt: "Visão computacional · IoT · SaaS", en: "Computer vision · IoT · SaaS" },
+    blurb: {
+      pt: "Câmeras e visão computacional que só registram uma mudança depois de confirmada.",
+      en: "Cameras and computer vision that only log a change once it is confirmed.",
+    },
     summary: {
       pt: "Plataforma que acompanha obras por câmeras: um agente captura imagens em intervalos (webcam ou RTSP), a API compara cada imagem com a referência da zona e só registra uma mudança quando a captura seguinte a confirma. Um modelo de visão (local com Ollama ou Gemini, com autorização dupla para mandar imagem para fora) descreve o que mudou, e cada evento guarda as imagens que o sustentam. Cada região vira uma memória com histórico só de inserção, separando fato observado, hipótese da IA e decisão humana, com revisão, comparador antes/depois e um laboratório que mede o detector contra gabarito humano.",
       en: "Platform that monitors construction sites through cameras: an agent captures images at intervals (webcam or RTSP), the API compares each image with the zone's reference and only records a change once the next capture confirms it. A vision model (local via Ollama, or Gemini behind a two-step opt-in for sending images out) describes what changed, and every event keeps the images that back it. Each region becomes an append-only memory that keeps observed fact, AI hypothesis and human decision apart, with review, a before/after comparator and a lab that scores the detector against human ground truth.",
@@ -95,6 +105,10 @@ export const projects: Project[] = [
       en: "Skill marketplace for AI agents",
     },
     kicker: { pt: "Marketplace SaaS · pagamentos", en: "SaaS marketplace · payments" },
+    blurb: {
+      pt: "Publicar e monetizar skills para agentes, com repasse aos vendedores via Stripe Connect.",
+      en: "Publish and sell skills for agents, with seller payouts through Stripe Connect.",
+    },
     summary: {
       pt: "Plataforma onde desenvolvedores publicam e monetizam “skills” reutilizáveis para agentes de IA. Back-end de alta performance com Laravel + Octane, pagamentos e repasses a vendedores via Stripe Connect, e front-end em Next.js. Monorepo containerizado com deploy automatizado.",
       en: "Platform where developers publish and monetize reusable “skills” for AI agents. High-performance back-end with Laravel + Octane, payments and seller payouts via Stripe Connect, and a Next.js front-end. Containerized monorepo with automated deploy.",
@@ -121,6 +135,10 @@ export const projects: Project[] = [
       en: "Auction triage with computer vision",
     },
     kicker: { pt: "App mobile · ML · scraping", en: "Mobile app · ML · scraping" },
+    blurb: {
+      pt: "OCR nos editais, visão computacional nas fotos e um score que cruza com a FIPE.",
+      en: "OCR on auction notices, computer vision on the photos and a score checked against FIPE prices.",
+    },
     summary: {
       pt: "App mobile (Android/iOS) que agrega leilões automotivos de várias casas leiloeiras e prioriza oportunidades. Um scraper coleta os lotes, um pipeline de OCR + NLP extrai riscos dos editais em PDF e um microsserviço de visão computacional (CLIP, zero-shot, sem GPU) classifica danos nas fotos dos veículos. O motor de score cruza preço FIPE, risco e margem potencial. Projetado para custo operacional baixo, sem APIs pagas de IA.",
       en: "Mobile app (Android/iOS) that aggregates vehicle auctions from several auction houses and ranks opportunities. A scraper collects the lots, an OCR + NLP pipeline extracts risks from the PDF notices, and a computer-vision microservice (CLIP, zero-shot, no GPU) classifies damage in the vehicle photos. The scoring engine combines market (FIPE) price, risk and potential margin. Built for low operating cost, with no paid AI APIs.",
@@ -147,6 +165,10 @@ export const projects: Project[] = [
       en: "Live copilot for English conversations",
     },
     kicker: { pt: "App desktop · áudio em tempo real · IA", en: "Desktop app · real-time audio · AI" },
+    blurb: {
+      pt: "Transcrição e tradução ao vivo de chamadas em inglês, com teto de custo automático.",
+      en: "Live transcription and translation of English calls, with an automatic spending cap.",
+    },
     summary: {
       pt: "App para Windows que acompanha chamadas e entrevistas em inglês: captura o áudio que o computador reproduz, mostra a transcrição em tempo real e a tradução em português enquanto a pessoa ainda está falando. Também transforma uma ideia digitada em português numa frase curta em inglês, no nível escolhido. Só envia trechos com fala detectada, estima o custo ao vivo e para sozinho ao bater o teto de tempo ou de gasto. Não grava áudio em disco e guarda a chave no cofre do Windows.",
       en: "Windows app that follows calls and interviews in English: it captures the audio the computer plays, shows a live transcript and the Portuguese translation while the person is still speaking. It also turns an idea typed in Portuguese into a short English sentence at the chosen level. It only sends audio where speech was detected, estimates cost live and stops itself at the time or spending cap. No audio is written to disk and the API key lives in the Windows credential vault.",
@@ -199,6 +221,10 @@ export const projects: Project[] = [
       en: "Public-health data pipeline",
     },
     kicker: { pt: "Engenharia de dados · geoespacial", en: "Data engineering · geospatial" },
+    blurb: {
+      pt: "Cruza dados públicos do DATASUS para priorizar hospitais num mapa interativo.",
+      en: "Cross-references public DATASUS data to rank hospitals on an interactive map.",
+    },
     summary: {
       pt: "Pipeline em Python que cruza dados 100% públicos do DATASUS (produção hospitalar, estrutura, habilitações e teto financeiro) para localizar e priorizar hospitais filantrópicos candidatos a recuperação de faturamento no SUS. Inclui um modelo de score composto, geolocalização dos estabelecimentos e um mapa interativo.",
       en: "Python pipeline that cross-references 100% public DATASUS data (hospital production, structure, accreditations and funding ceilings) to locate and prioritize philanthropic hospitals that are candidates for SUS revenue recovery. It includes a composite scoring model, facility geolocation and an interactive map.",
@@ -298,3 +324,6 @@ export const projects: Project[] = [
     year: "2026",
   },
 ];
+
+// The four shown on the home page, in this order (picked by Christian).
+export const homeProjectSlugs = ["ai-support-agent", "construction-vision", "call-copilot", "sus-revenue-map"];

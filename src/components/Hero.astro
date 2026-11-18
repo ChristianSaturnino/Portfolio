@@ -1,0 +1,98 @@
+---
+import Icon from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { useTranslations, contactPath } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// last word of the tagline gets the accent
+const words = site.tagline[lang].split(" ");
+const last = words.pop();
+const [role, focus] = site.role[lang].split(" · ");
+---
+
+<section class="hero wrap">
+  <div class="who">
+    <img src="/img/christian.webp" alt="" width="56" height="56" />
+    <p>
+      <strong>{role}</strong>
+      <span>{focus} · {site.location[lang]}</span>
+    </p>
+  </div>
+
+  <h1 class="display">
+    {words.join(" ")} <span class="hl">{last}</span>
+  </h1>
+
+  <p class="sub">{t("home.sub")}</p>
+
+  <div class="ctas">
+    <a class="btn btn-accent big" href={contactPath(lang)}>
+      <Icon name="message" />
+      {t("home.talk")}
+    </a>
+    <a class="btn btn-ghost big" href="#projetos">{t("home.seeProjects")}</a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    padding-bottom: clamp(3rem, 6vw, 4.5rem);
+  }
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+  .who img {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .who p {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+    font-size: 0.95rem;
+    color: var(--ink-2);
+  }
+  .who strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  h1 {
+    font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    max-width: 21ch;
+    text-wrap: balance;
+  }
+  .hl {
+    color: var(--accent);
+  }
+  .sub {
+    margin-top: 1.25rem;
+    max-width: 34rem;
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    color: var(--ink-2);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+  .big {
+    height: 3.1rem;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+  }
+</style>

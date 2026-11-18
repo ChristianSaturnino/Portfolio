@@ -18,7 +18,7 @@ const cols: { title: string; links: { label: string; href: string; icon?: IconNa
   {
     title: t("footer.browse"),
     links: [
-      { label: t("nav.feed"), href: homePath(lang) },
+      { label: t("nav.home"), href: homePath(lang) },
       { label: t("nav.projects"), href: projectsPath(lang) },
       { label: t("nav.stack"), href: stackPath(lang) },
       { label: t("nav.contact"), href: contactPath(lang) },
@@ -91,7 +91,7 @@ const cols: { title: string; links: { label: string; href: string; icon?: IconNa
           <span class:list={{ on: lang === "pt" }}>PT</span>
           <span class:list={{ on: lang === "en" }}>EN</span>
         </a>
-        <a class="pill" href="#feed">
+        <a class="pill" href="#top">
           {t("footer.top")}
           <Icon name="arrow" class="up" />
         </a>
@@ -113,7 +113,7 @@ const cols: { title: string; links: { label: string; href: string; icon?: IconNa
     overflow: hidden;
   }
   .inner {
-    max-width: calc(var(--col-side) + var(--col-feed) + var(--col-rail));
+    max-width: 1120px;
     margin: 0 auto;
     padding: 3.5rem 1.5rem 1.5rem;
   }

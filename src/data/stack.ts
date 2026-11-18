@@ -2,11 +2,10 @@ import { skillGroups } from "./skills";
 import { experience, education, certifications } from "./experience";
 import { projects } from "./projects";
 import { flagship } from "./flagship";
-import { feed } from "./feed";
 import type { Lang } from "./site";
 
-// Builds the /stack page: every skill from skills.ts plus the feed posts that
-// mention it. Usage is found by searching the real text of jobs, projects and
+// Builds the /stack page: every skill from skills.ts plus the places on the site
+// that mention it. Usage is found by searching the real text of jobs, projects and
 // certifications, so nothing here is claimed that the rest of the site doesn't say.
 
 type L = { pt: string; en: string };
@@ -40,31 +39,40 @@ const aliases: Record<string, string[]> = {
 };
 
 interface Source {
-  id: string; // feed post id, used for the link back
+  id: string; // unique key, so a tech lists each place once
+  page: "home" | "projects"; // where the link back goes
+  hash: string; // anchor on that page
   label: L;
   text: string; // lowercase haystack, both languages
 }
 
-const postId = (match: (p: (typeof feed)[number]) => boolean) => feed.find(match)?.id ?? "";
-
 const sources: Source[] = [
   {
     id: "maria",
+    page: "home",
+    hash: "maria",
     label: { pt: flagship.name, en: flagship.name },
     text: [flagship.body.pt, flagship.body.en, ...flagship.stack, ...flagship.flow.en].join(" "),
   },
-  ...experience.map((j) => ({
-    id: postId((p) => p.type === "job" && p.job === j),
+  ...experience.map((j, i): Source => ({
+    id: `job-${i}`,
+    page: "home",
+    hash: "carreira",
     label: { pt: `${j.company} · ${j.role.pt}`, en: `${j.company} · ${j.role.en}` },
     text: [...j.bullets.pt, ...j.bullets.en].join(" "),
   })),
-  ...projects.map((pr) => ({
+  ...projects.map((pr): Source => ({
     id: pr.slug,
+    page: "projects",
+    hash: pr.slug,
     label: pr.title,
     text: [pr.summary.pt, pr.summary.en, pr.contribution.en, ...pr.stack].join(" "),
   })),
-  ...[...education, ...certifications].map((c) => ({
-    id: postId((p) => p.type === "credential" && p.items.includes(c)),
+  ...[...education, ...certifications].map((c): Source => ({
+    // certs from the same issuer share one link
+    id: `cred-${c.issuer}`,
+    page: "home",
+    hash: "carreira",
     label: { pt: c.issuer, en: c.issuer },
     text: [typeof c.title === "string" ? c.title : `${c.title.pt} ${c.title.en}`, c.issuer].join(" "),
   })),
@@ -82,7 +90,7 @@ export interface Tech {
   key: string;
   name: L;
   core: boolean;
-  usedIn: { id: string; label: L }[];
+  usedIn: { id: string; page: Source["page"]; hash: string; label: L }[];
 }
 
 export interface Area {
@@ -96,10 +104,10 @@ export const areas: Area[] = skillGroups.map((g) => ({
     const name: L = typeof i === "string" ? { pt: i, en: i } : i;
     const key = name.pt;
     const usedIn = sources
-      .filter((s) => s.id && (mentions(name.pt, s.text) || mentions(name.en, s.text)))
-      // one chip per post, even when several certs share it
+      .filter((s) => (mentions(name.pt, s.text) || mentions(name.en, s.text)))
+      // one chip per place, even when several certs share it
       .filter((s, idx, all) => all.findIndex((o) => o.id === s.id) === idx)
-      .map(({ id, label }) => ({ id, label }));
+      .map(({ id, page, hash, label }) => ({ id, page, hash, label }));
     return { key, name, core: core.has(key), usedIn };
   }),
 }));

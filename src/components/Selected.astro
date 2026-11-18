@@ -1,0 +1,189 @@
+---
+import Icon from "./Icon.astro";
+import { projects, homeProjectSlugs } from "../data/projects";
+import type { Lang } from "../data/site";
+import { useTranslations, projectsPath } from "../i18n/ui";
+
+// Four picked projects (homeProjectSlugs), then a card pointing to the rest.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const list = homeProjectSlugs.map((slug) => projects.find((p) => p.slug === slug)!).filter(Boolean);
+const rest = projects.filter((p) => !homeProjectSlugs.includes(p.slug));
+const all = projectsPath(lang);
+---
+
+<section class="wrap block" id="projetos" aria-labelledby="projetos-h">
+  <div class="sec-head">
+    <h2 id="projetos-h" class="sec-title display">{t("home.selected")}</h2>
+    <a class="more" href={all}>
+      {t("home.all")} {projects.length}
+      <Icon name="arrow" />
+    </a>
+  </div>
+
+  <ul class="grid">
+    {
+      list.map((p) => {
+        const cover = p.shots?.[0];
+        return (
+          <li>
+            <a href={`${all}#${p.slug}`} class="card">
+              {cover && (
+                <img
+                  src={cover.src}
+                  alt={cover.alt[lang]}
+                  width={cover.width}
+                  height={cover.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+              <span class="meta">
+                <span class="title">
+                  {p.title[lang]}
+                  {p.status && <span class="status">{p.status[lang]}</span>}
+                </span>
+                <span class="blurb">{(p.blurb ?? p.kicker)[lang]}</span>
+              </span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  {
+    rest.length > 0 && (
+      <a href={all} class="rest">
+        <span class="rest-text">
+          <span class="rest-title display">
+            {t("home.more")} <span class="hl">{rest.length}</span> {t("home.moreProjects")}
+          </span>
+          <span class="rest-names">{rest.map((p) => p.title[lang]).join(" · ")}</span>
+        </span>
+        <span class="btn btn-accent rest-btn">
+          {t("home.seeAll")}
+          <Icon name="arrow" />
+        </span>
+      </a>
+    )
+  }
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem 1.5rem;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 1rem;
+    border: 1px solid var(--line);
+    background: var(--card);
+    transition: transform 0.35s var(--ease), border-color 0.2s ease;
+  }
+  .card:hover img {
+    transform: translateY(-4px);
+    border-color: var(--line-strong);
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1.15rem;
+  }
+  .card:hover .title {
+    color: var(--accent-text);
+  }
+  .status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  .blurb {
+    color: var(--ink-2);
+    font-size: 0.97rem;
+  }
+  /* "there are N more" card, so the four above don't read as everything */
+  .rest {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    margin-top: 2.5rem;
+    padding: clamp(1.5rem, 3.5vw, 2.25rem);
+    border-radius: 1.25rem;
+    border: 1px dashed var(--line-strong);
+    background: var(--card);
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .rest:hover {
+    border-color: var(--accent);
+    background: var(--card-hover);
+  }
+  .rest-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1 1 22rem;
+    min-width: 0;
+  }
+  .rest-title {
+    font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .hl {
+    color: var(--accent);
+  }
+  .rest-names {
+    font-size: 0.92rem;
+    color: var(--ink-2);
+  }
+  .rest-btn {
+    height: 3rem;
+    padding: 0 1.4rem;
+    font-size: 1rem;
+  }
+  .rest:hover .rest-btn :global(.icon) {
+    transform: translateX(3px);
+  }
+  .rest-btn :global(.icon) {
+    transition: transform 0.15s var(--ease);
+  }
+  @media (max-width: 700px) {
+    .rest-btn {
+      width: 100%;
+    }
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+</style>

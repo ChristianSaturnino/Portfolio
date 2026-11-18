@@ -3,7 +3,7 @@ import Shell from "./Shell.astro";
 import Icon from "./Icon.astro";
 import { site, type Lang } from "../data/site";
 import { areas, allTech, coreTech } from "../data/stack";
-import { useTranslations, homePath } from "../i18n/ui";
+import { useTranslations, homePath, projectsPath } from "../i18n/ui";
 
 interface Props {
   lang: Lang;
@@ -106,7 +106,7 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+
                         <ul>
                           {x.usedIn.map((u) => (
                             <li>
-                              <a href={`${home}#${u.id}`} title={u.label[lang]}>
+                              <a href={`${u.page === "projects" ? projectsPath(lang) : home}#${u.hash}`} title={u.label[lang]}>
                                 {u.label[lang]}
                               </a>
                             </li>

@@ -4,7 +4,9 @@ export interface Job {
   logo?: { src: string; width: number; height: number };
   url?: string;
   role: { pt: string; en: string };
-  // first line of this job's post in the feed
+  // short level, joined with arrows when one company has several roles (home career list)
+  level?: { pt: string; en: string };
+  // one-line announcement of this job (not shown on the current home)
   headline: { pt: string; en: string };
   period: { pt: string; en: string };
   start: string; // ISO-ish, for ordering
@@ -41,6 +43,7 @@ export const experience: Job[] = [
     company: "Pedbot",
     logo: logos.pedbot,
     role: { pt: "Desenvolvedor Full Stack Pleno", en: "Mid-Level Full Stack Developer" },
+    level: { pt: "Pleno", en: "Mid-level" },
     headline: {
       pt: "Promovido a Desenvolvedor Full Stack Pleno na Pedbot.",
       en: "Promoted to Mid-Level Full Stack Developer at Pedbot.",
@@ -66,6 +69,7 @@ export const experience: Job[] = [
     company: "Pedbot",
     logo: logos.pedbot,
     role: { pt: "Desenvolvedor Full Stack Júnior", en: "Junior Full Stack Developer" },
+    level: { pt: "Júnior", en: "Junior" },
     headline: {
       pt: "Virei Desenvolvedor Full Stack Júnior na Pedbot.",
       en: "Became a Junior Full Stack Developer at Pedbot.",
@@ -87,6 +91,7 @@ export const experience: Job[] = [
     company: "Pedbot",
     logo: logos.pedbot,
     role: { pt: "Estagiário de Desenvolvimento", en: "Software Development Intern" },
+    level: { pt: "Estágio", en: "Intern" },
     headline: {
       pt: "Primeiro dia como estagiário de desenvolvimento na Pedbot.",
       en: "First day as a software development intern at Pedbot.",

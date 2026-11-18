@@ -55,7 +55,7 @@ const ogImage = new URL(`/img/og-${lang}.png`, Astro.site ?? Astro.url).href;
     <link rel="alternate" hreflang="en" href={new URL("/en", Astro.site ?? Astro.url).href} />
   </head>
   <body>
-    <a href="#feed" class="skip-link">{t("skip")}</a>
+    <a href="#main" class="skip-link">{t("skip")}</a>
     <slot />
     <WhatsAppButton lang={lang} />
 
@@ -77,47 +77,5 @@ const ogImage = new URL(`/img/og-${lang}.png`, Astro.site ?? Astro.url).href;
         top: 1rem;
       }
     </style>
-
-    <script>
-      // feed filter tabs: shown only when JS runs, so no-JS visitors get the full feed
-      const tabs = [...document.querySelectorAll<HTMLButtonElement>("[data-tab]")];
-      const posts = [...document.querySelectorAll<HTMLElement>("[data-tabs]")];
-      document.querySelector("[data-tablist]")?.removeAttribute("hidden");
-
-      const select = (tab: string) => {
-        tabs.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
-        posts.forEach((p) => {
-          p.hidden = tab !== "all" && !p.dataset.tabs!.split(" ").includes(tab);
-        });
-      };
-      tabs.forEach((b) =>
-        b.addEventListener("click", () => {
-          select(b.dataset.tab!);
-          const top = document.getElementById("timeline");
-          if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: "start" });
-        })
-      );
-
-      // copy a post's permalink
-      document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((b) => {
-        b.addEventListener("click", async () => {
-          const url = `${location.origin}${location.pathname}#${b.dataset.copy}`;
-          try {
-            await navigator.clipboard.writeText(url);
-          } catch {
-            location.hash = b.dataset.copy!;
-            return;
-          }
-          b.dataset.done = "";
-          const label = b.querySelector("[data-label]");
-          const prev = label?.textContent;
-          if (label) label.textContent = b.dataset.doneLabel ?? "";
-          setTimeout(() => {
-            delete b.dataset.done;
-            if (label) label.textContent = prev ?? "";
-          }, 1800);
-        });
-      });
-    </script>
   </body>
 </html>

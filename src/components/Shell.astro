@@ -1,14 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
-import Sidebar from "./Sidebar.astro";
+import TopBar from "./TopBar.astro";
 import Icon from "./Icon.astro";
 import Footer from "./Footer.astro";
 import type { Lang } from "../data/site";
 import type { Page } from "../i18n/ui";
 import { useTranslations, homePath } from "../i18n/ui";
 
-// Frame for the standalone pages (stack, contact): sidebar, one wide column
-// and a sticky top bar with a back arrow to the feed.
+// Frame for the standalone pages (projects, stack, contact): the site header,
+// one wide column and a title row with a back arrow to the home page.
 interface Props {
   lang: Lang;
   page: Page;
@@ -22,56 +22,38 @@ const t = useTranslations(lang);
 ---
 
 <Base lang={lang} title={title} description={description}>
-  <div class="app">
-    <Sidebar lang={lang} page={page} />
-
-    <main id="feed" class="column">
-      <div class="topbar">
-        <a href={homePath(lang)} class="back" aria-label={t("stack.back")}>
-          <Icon name="arrow" />
-        </a>
-        <div>
-          <p class="tb-title display">{barTitle}</p>
-          <p class="tb-sub">{barSub}</p>
-        </div>
+  <TopBar lang={lang} page={page} />
+  <main id="main" class="column">
+    <div class="pagebar">
+      <a href={homePath(lang)} class="back" aria-label={t("stack.back")}>
+        <Icon name="arrow" />
+      </a>
+      <div>
+        <p class="tb-title display">{barTitle}</p>
+        <p class="tb-sub">{barSub}</p>
       </div>
+    </div>
 
-      <slot />
-    </main>
-  </div>
+    <slot />
+  </main>
   <Footer lang={lang} page={page} />
 </Base>
 
 <style>
-  .app {
-    display: grid;
-    grid-template-columns: var(--col-side) minmax(0, 940px);
-    justify-content: center;
-    align-items: start;
-    min-height: 100vh;
-    padding: 0 1rem;
-  }
-  .app > :global(.side) {
-    align-self: stretch;
-  }
   .column {
+    max-width: 940px;
+    margin: 1rem auto 4rem;
     background: var(--card);
-    border-left: 1px solid var(--line);
-    border-right: 1px solid var(--line);
-    min-height: 100vh;
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    overflow: hidden;
   }
 
-  .topbar {
-    position: sticky;
-    top: var(--stick, 0px);
-    z-index: 10;
+  .pagebar {
     display: flex;
     align-items: center;
     gap: 1.1rem;
-    padding: 0.45rem 1.25rem;
-    background: color-mix(in srgb, var(--card) 86%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    padding: 0.6rem 1.25rem;
     border-bottom: 1px solid var(--line);
   }
   .back {
@@ -98,24 +80,18 @@ const t = useTranslations(lang);
     color: var(--ink-3);
   }
 
-  @media (max-width: 1100px) {
-    .app {
-      grid-template-columns: 5rem minmax(0, 940px);
+  @media (max-width: 980px) {
+    .column {
+      margin: 0.5rem 1rem 3rem;
     }
   }
-
   @media (max-width: 700px) {
-    .app {
-      grid-template-columns: minmax(0, 1fr);
-      padding: 0;
-      --stick: var(--bar-h);
-    }
     .column {
-      border: 0;
+      margin: 0 0 2rem;
+      border-radius: 0;
+      border-inline: 0;
     }
-    /* the tab bar already handles navigation here, so this bar just scrolls away */
-    .topbar {
-      position: static;
+    .pagebar {
       padding: 0.4rem 1rem;
     }
   }

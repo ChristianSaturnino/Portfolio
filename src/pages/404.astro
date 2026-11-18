@@ -12,7 +12,7 @@ const copy = {
     lead: "Este post não existe.",
     body: "O link pode estar quebrado, ou a página foi movida. A timeline continua no mesmo lugar.",
     when: "agora",
-    home: "Voltar ao feed",
+    home: "Voltar ao início",
     projects: "Ver projetos",
     contact: "Falar comigo",
   },
@@ -21,7 +21,7 @@ const copy = {
     lead: "This post doesn't exist.",
     body: "The link may be broken, or the page was moved. The timeline is still where you left it.",
     when: "now",
-    home: "Back to the feed",
+    home: "Back to home",
     projects: "See projects",
     contact: "Get in touch",
   },
@@ -31,7 +31,7 @@ const handle = site.socials.github.split("/").pop();
 ---
 
 <Base lang="pt" title={`404 · ${site.name}`} description={copy.pt.title}>
-  <main id="feed" class="wrap">
+  <main id="main" class="wrap">
     <div class="orbit" aria-hidden="true">
       <span class="mark"></span>
     </div>

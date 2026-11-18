@@ -1,0 +1,114 @@
+---
+import Icon from "./Icon.astro";
+import { experience, education, certifications, type Job } from "../data/experience";
+import { site, type Lang } from "../data/site";
+import { useTranslations } from "../i18n/ui";
+
+// One line per company: back-to-back roles at the same place collapse into
+// one row ("Estágio → Júnior → Pleno"), with the period spanning all of them.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const groups: Job[][] = [];
+for (const j of experience) {
+  const g = groups.at(-1);
+  if (g && g[0].company === j.company) g.push(j);
+  else groups.push([j]);
+}
+
+const rows = groups.map((g) => {
+  const newest = g[0];
+  const oldest = g[g.length - 1];
+  const from = oldest.period[lang].split(" → ")[0];
+  const to = newest.period[lang].split(" → ")[1];
+  const levels = g.length > 1 ? [...g].reverse().map((j) => j.level?.[lang] ?? j.role[lang]).join(" → ") : "";
+  return { company: newest.company, role: newest.role[lang], levels, period: `${from} → ${to}` };
+});
+
+const degree = education[0];
+const issuers = [...new Set(certifications.map((c) => c.issuer.replace(" Skills Boost", "")))];
+---
+
+<section class="wrap block" id="carreira" aria-labelledby="carreira-h">
+  <div class="sec-head">
+    <h2 id="carreira-h" class="sec-title display">{t("home.career")}</h2>
+    <a class="more" href={site.cv[lang]} target="_blank" rel="noopener">
+      {t("home.fullCv")}
+      <Icon name="arrow" />
+    </a>
+  </div>
+
+  <ol class="list">
+    {
+      rows.map((r) => (
+        <li class="row">
+          <span class="when">{r.period}</span>
+          <span class="what">
+            {r.role}
+            {r.levels && <span class="levels">{r.levels}</span>}
+          </span>
+          <span class="where">{r.company}</span>
+        </li>
+      ))
+    }
+    {
+      degree && (
+        <li class="row">
+          <span class="when">{t("home.education")}</span>
+          <span class="what">
+            {typeof degree.title === "string" ? degree.title : degree.title[lang]}
+            <span class="levels">
+              {certifications.length} {t("home.certs")} · {issuers.join(", ")}
+            </span>
+          </span>
+          <span class="where">
+            {degree.issuer.split(" · ")[0]}, {degree.year}
+          </span>
+        </li>
+      )
+    }
+  </ol>
+</section>
+
+<style>
+  .list {
+    list-style: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 0.25rem 1.5rem;
+    align-items: baseline;
+    padding: 1.3rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .when {
+    font-size: 0.92rem;
+    color: var(--ink-3);
+  }
+  .what {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+  }
+  .levels {
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: var(--ink-3);
+  }
+  .where {
+    color: var(--ink-2);
+  }
+  @media (max-width: 700px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .when {
+      order: 3;
+    }
+  }
+</style>

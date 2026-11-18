@@ -1,0 +1,188 @@
+---
+import Icon from "./Icon.astro";
+import { site, type Lang } from "../data/site";
+import { useTranslations, homePath, projectsPath, stackPath, contactPath, pagePath, type Page } from "../i18n/ui";
+
+// Site header on every page: name, the four destinations, résumé and the
+// language toggle. Sticky, translucent over the page.
+interface Props {
+  lang: Lang;
+  page?: Page;
+}
+const { lang, page = "home" } = Astro.props;
+const t = useTranslations(lang);
+const other: Lang = lang === "pt" ? "en" : "pt";
+const home = homePath(lang);
+
+const links = [
+  { href: projectsPath(lang), label: t("nav.projects"), active: page === "projects" },
+  { href: `${home}#sobre`, label: t("nav.about") },
+  { href: stackPath(lang), label: t("nav.stack"), active: page === "stack" },
+  { href: contactPath(lang), label: t("nav.contact"), active: page === "contact" },
+];
+---
+
+<header class="bar" id="top">
+  <div class="wrap row">
+    <a href={home} class="brand display" aria-label={site.name}>
+      <span class="mark" aria-hidden="true"></span>
+      {site.name}
+    </a>
+
+    <nav aria-label={lang === "pt" ? "Navegação" : "Navigation"}>
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} aria-current={l.active ? "page" : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="tools">
+      <a class="cv" href={site.cv[lang]} target="_blank" rel="noopener">
+        <Icon name="file" />
+        {t("nav.resume")}
+      </a>
+      <a class="lang" href={pagePath(other, page)} hreflang={other} aria-label={t("lang.switchLabel")}>
+        {t("lang.switch")}
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 4.25rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    white-space: nowrap;
+  }
+  .mark {
+    width: 1.9rem;
+    aspect-ratio: 723 / 359;
+    background: var(--accent);
+    -webkit-mask: url("/img/logo-mark.png") center / contain no-repeat;
+    mask: url("/img/logo-mark.png") center / contain no-repeat;
+  }
+  nav {
+    margin-left: auto;
+  }
+  nav ul {
+    display: flex;
+    gap: 0.25rem;
+  }
+  nav a {
+    display: block;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    color: var(--ink-2);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  nav a:hover,
+  nav a[aria-current="page"] {
+    color: var(--ink);
+    background: var(--card);
+  }
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cv {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+  .cv:hover {
+    background: var(--card);
+  }
+  .lang {
+    display: grid;
+    place-items: center;
+    min-width: 2.75rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .lang:hover {
+    color: var(--ink);
+    background: var(--card);
+  }
+
+  /* phones: links move to a second, swipeable row */
+  @media (max-width: 760px) {
+    .row {
+      flex-wrap: wrap;
+      height: auto;
+      padding-top: 0.6rem;
+      gap: 0.25rem 1rem;
+    }
+    .tools {
+      margin-left: auto;
+    }
+    nav {
+      order: 3;
+      margin: 0 -1rem;
+      width: calc(100% + 2rem);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+    nav ul {
+      padding: 0.15rem 0.6rem 0.5rem;
+    }
+    nav a {
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    .cv {
+      height: 2.25rem;
+      padding: 0 0.8rem;
+      font-size: 0.85rem;
+    }
+  }
+  @media (max-width: 380px) {
+    .brand {
+      font-size: 0.95rem;
+    }
+    .cv :global(.icon) {
+      display: none;
+    }
+  }
+</style>
