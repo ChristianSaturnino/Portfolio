@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Vercel build output
+.vercel/
+
+# assistant profile (goes to Vercel as ASSISTANT_PROFILE, never to Git)
+private/
